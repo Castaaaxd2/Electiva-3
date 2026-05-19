@@ -23,6 +23,7 @@ import Animated, {
   withTiming,
   FadeIn,
   FadeInDown,
+  FadeInUp,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -36,6 +37,7 @@ export default function IdentifyScreen() {
   const { addToHistory } = useBirdStore();
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedBase64, setSelectedBase64] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const analyzeButtonScale = useSharedValue(1);
@@ -49,13 +51,12 @@ export default function IdentifyScreen() {
     transform: [{ scale: imageScale.value }],
   }));
 
-  const handleAnalyzePress = useCallback(async () => {
+  const handleCameraPress = useCallback(async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    analyzeButtonScale.value = withSequence(withSpring(0.94), withSpring(1));
 
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permiso requerido", "Se necesita acceso a la cámara para identificar aves.");
+      Alert.alert("Permiso requerido", "Se necesita acceso a la cámara para tomar fotos.");
       return;
     }
 
@@ -70,10 +71,8 @@ export default function IdentifyScreen() {
     if (!result.canceled && result.assets[0]) {
       const asset = result.assets[0];
       setSelectedImage(asset.uri);
+      setSelectedBase64(asset.base64 ?? null);
       imageScale.value = withSequence(withTiming(0.95, { duration: 100 }), withSpring(1));
-      if (asset.base64) {
-        await analyzeImage(asset.base64);
-      }
     }
   }, []);
 
@@ -91,19 +90,21 @@ export default function IdentifyScreen() {
     if (!result.canceled && result.assets[0]) {
       const asset = result.assets[0];
       setSelectedImage(asset.uri);
+      setSelectedBase64(asset.base64 ?? null);
       imageScale.value = withSequence(withTiming(0.95, { duration: 100 }), withSpring(1));
-      if (asset.base64) {
-        await analyzeImage(asset.base64);
-      }
     }
   }, []);
 
-  const analyzeImage = useCallback(async (base64: string) => {
+  const handleAnalyzePress = useCallback(async () => {
+    if (!selectedBase64) return;
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    analyzeButtonScale.value = withSequence(withSpring(0.94), withSpring(1));
+
     setIsAnalyzing(true);
     try {
-      const result = await identifyBirdFromBase64(base64);
+      const result = await identifyBirdFromBase64(selectedBase64);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      addToHistory({ ...result, imageBase64: base64 });
+      addToHistory({ ...result, imageBase64: selectedBase64 });
       router.push({ pathname: "/result", params: { resultId: result.analyzedAt } });
     } catch (err) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -111,7 +112,12 @@ export default function IdentifyScreen() {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [addToHistory]);
+  }, [selectedBase64, addToHistory]);
+
+  const handleReset = useCallback(() => {
+    setSelectedImage(null);
+    setSelectedBase64(null);
+  }, []);
 
   const styles = makeStyles(colors);
 
@@ -131,9 +137,9 @@ export default function IdentifyScreen() {
         <Animated.View entering={FadeInDown.duration(500)} style={styles.header}>
           <Text style={styles.tagline}>Apunta. Fotografía. Descubre.</Text>
           <Text style={styles.title}>BirdLens</Text>
-          <Text style={styles.subtitle}>32 especies identificables</Text>
         </Animated.View>
 
+        {/* Imagen seleccionada */}
         {selectedImage ? (
           <Animated.View style={[styles.imageContainer, animatedImageStyle]} entering={FadeIn.duration(400)}>
             <Image source={{ uri: selectedImage }} style={styles.selectedImage} />
@@ -144,97 +150,95 @@ export default function IdentifyScreen() {
               </View>
             )}
             {!isAnalyzing && (
-              <Pressable style={styles.retakeButton} onPress={handleAnalyzePress}>
-                <Ionicons name="camera" size={16} color="#FFFFFF" />
-                <Text style={styles.retakeText}>Nueva foto</Text>
+              <Pressable style={styles.resetButton} onPress={handleReset}>
+                <Ionicons name="close" size={16} color="#FFFFFF" />
+                <Text style={styles.resetText}>Cambiar foto</Text>
               </Pressable>
             )}
           </Animated.View>
         ) : (
+          /* Placeholder cuando no hay foto */
           <Animated.View entering={FadeInDown.delay(200).duration(500)} style={styles.placeholder}>
             <View style={styles.placeholderInner}>
               <Ionicons name="camera" size={56} color={colors.primary} />
               <Text style={styles.placeholderTitle}>Sin foto</Text>
-              <Text style={styles.placeholderText}>Toma o sube una foto para identificar una especie de ave</Text>
+              <Text style={styles.placeholderText}>
+                Toma o sube una foto del ave para comenzar la identificación
+              </Text>
             </View>
           </Animated.View>
         )}
 
-        {/* Botón principal: Analizar especie */}
-        <Animated.View entering={FadeInDown.delay(300).duration(500)} style={styles.actions}>
-          <Animated.View style={animatedAnalyzeStyle}>
-            <Pressable
-              style={[styles.analyzeButton, isAnalyzing && styles.buttonDisabled]}
-              onPress={handleAnalyzePress}
-              disabled={isAnalyzing}
-            >
+        {/* Botones: cambia según si hay foto o no */}
+        {selectedImage ? (
+          /* Con foto: mostrar botón "Analizar especie" */
+          <Animated.View entering={FadeInUp.duration(400)} style={styles.actions}>
+            <Animated.View style={animatedAnalyzeStyle}>
+              <Pressable
+                style={[styles.analyzeButton, isAnalyzing && styles.buttonDisabled]}
+                onPress={handleAnalyzePress}
+                disabled={isAnalyzing}
+              >
+                <LinearGradient
+                  colors={["#6FB3A0", "#5D9E8A"]}
+                  style={StyleSheet.absoluteFill}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                />
+                {isAnalyzing ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Ionicons name="scan" size={22} color="#FFFFFF" />
+                )}
+                <Text style={styles.analyzeButtonText}>
+                  {isAnalyzing ? "Analizando..." : "Analizar especie"}
+                </Text>
+              </Pressable>
+            </Animated.View>
+          </Animated.View>
+        ) : (
+          /* Sin foto: mostrar botones para obtener imagen */
+          <Animated.View entering={FadeInDown.delay(300).duration(500)} style={styles.actions}>
+            <Pressable style={styles.cameraButton} onPress={handleCameraPress}>
               <LinearGradient
                 colors={["#6FB3A0", "#5D9E8A"]}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               />
-              {isAnalyzing ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
-              ) : (
-                <Ionicons name="scan" size={22} color="#FFFFFF" />
-              )}
-              <Text style={styles.analyzeButtonText}>
-                {isAnalyzing ? "Analizando..." : "Analizar especie"}
-              </Text>
+              <Ionicons name="camera" size={22} color="#FFFFFF" />
+              <Text style={styles.cameraButtonText}>Abrir Cámara</Text>
+            </Pressable>
+
+            <Pressable style={styles.galleryButton} onPress={handleGalleryPress}>
+              <Ionicons name="image-outline" size={20} color={colors.primary} />
+              <Text style={styles.galleryButtonText}>Elegir de la Galería</Text>
             </Pressable>
           </Animated.View>
+        )}
 
-          <Pressable
-            style={[styles.galleryButton, isAnalyzing && styles.buttonDisabled]}
-            onPress={handleGalleryPress}
-            disabled={isAnalyzing}
-          >
-            <Ionicons name="image-outline" size={20} color={colors.primary} />
-            <Text style={styles.galleryButtonText}>Elegir de la Galería</Text>
-          </Pressable>
-        </Animated.View>
-
-        {/* Especies disponibles */}
-        <Animated.View entering={FadeInDown.delay(400).duration(500)} style={styles.speciesCard}>
-          <Text style={styles.speciesCardTitle}>Especies del dataset</Text>
-          <View style={styles.speciesGrid}>
-            {BIRD_SPECIES_PREVIEW.map((name, i) => (
-              <View key={i} style={styles.speciesChip}>
-                <Text style={styles.speciesChipText}>{name}</Text>
-              </View>
-            ))}
-          </View>
-        </Animated.View>
-
-        <Animated.View entering={FadeInDown.delay(500).duration(500)} style={styles.tips}>
-          <Text style={styles.tipsTitle}>Consejos para mejores resultados</Text>
-          <View style={styles.tipRow}>
-            <View style={styles.tipDot} />
-            <Text style={styles.tipText}>Asegúrate de que el ave sea claramente visible y esté enfocada</Text>
-          </View>
-          <View style={styles.tipRow}>
-            <View style={styles.tipDot} />
-            <Text style={styles.tipText}>Una buena iluminación mejora significativamente la precisión</Text>
-          </View>
-          <View style={styles.tipRow}>
-            <View style={styles.tipDot} />
-            <Text style={styles.tipText}>Captura marcas distintivas como patrones de alas</Text>
-          </View>
-        </Animated.View>
+        {/* Consejos — solo visibles cuando no hay foto */}
+        {!selectedImage && (
+          <Animated.View entering={FadeInDown.delay(400).duration(500)} style={styles.tips}>
+            <Text style={styles.tipsTitle}>Consejos para mejores resultados</Text>
+            <View style={styles.tipRow}>
+              <View style={styles.tipDot} />
+              <Text style={styles.tipText}>Asegúrate de que el ave sea claramente visible y esté enfocada</Text>
+            </View>
+            <View style={styles.tipRow}>
+              <View style={styles.tipDot} />
+              <Text style={styles.tipText}>Una buena iluminación mejora significativamente la precisión</Text>
+            </View>
+            <View style={styles.tipRow}>
+              <View style={styles.tipDot} />
+              <Text style={styles.tipText}>Captura marcas distintivas como patrones de alas</Text>
+            </View>
+          </Animated.View>
+        )}
       </ScrollView>
     </View>
   );
 }
-
-const BIRD_SPECIES_PREVIEW = [
-  "Canario costeño", "Caracara plancus", "Carpinterito Oliváceo",
-  "Copetón", "Cucarachero común", "Colibrí Cola Canela",
-  "Garza ganadera", "Gavilán caminero", "Luis Bienteveo",
-  "Loro Cabeciazul", "Mirla patinaranja", "Perico carisucio",
-  "Tangara Azulegris", "Tangara dorada", "Tirano Pirirí",
-  "Tortolita común", "Zorzal Sabiá", "+ 15 más...",
-];
 
 function makeStyles(colors: ReturnType<typeof useColors>) {
   return StyleSheet.create({
@@ -263,14 +267,8 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       color: colors.foreground,
       marginTop: 4,
     },
-    subtitle: {
-      fontSize: 13,
-      fontFamily: "Inter_400Regular",
-      color: colors.mutedForeground,
-      marginTop: 2,
-    },
     placeholder: {
-      height: 220,
+      height: 240,
       borderRadius: colors.radius,
       backgroundColor: colors.card,
       overflow: "hidden",
@@ -298,7 +296,7 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       paddingHorizontal: 32,
     },
     imageContainer: {
-      height: 240,
+      height: 280,
       borderRadius: colors.radius,
       overflow: "hidden",
       marginBottom: 20,
@@ -319,19 +317,19 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       fontSize: 16,
       fontFamily: "Inter_500Medium",
     },
-    retakeButton: {
+    resetButton: {
       position: "absolute",
-      bottom: 12,
+      top: 12,
       right: 12,
       backgroundColor: "rgba(0,0,0,0.5)",
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
+      gap: 5,
       paddingHorizontal: 12,
       paddingVertical: 7,
       borderRadius: 20,
     },
-    retakeText: {
+    resetText: {
       color: "#FFFFFF",
       fontSize: 13,
       fontFamily: "Inter_500Medium",
@@ -341,7 +339,7 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       marginBottom: 24,
     },
     analyzeButton: {
-      height: 62,
+      height: 64,
       borderRadius: colors.radius,
       flexDirection: "row",
       alignItems: "center",
@@ -350,10 +348,24 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       overflow: "hidden",
     },
     analyzeButtonText: {
-      fontSize: 17,
+      fontSize: 18,
       fontFamily: "Inter_700Bold",
       color: "#FFFFFF",
       letterSpacing: 0.3,
+    },
+    cameraButton: {
+      height: 58,
+      borderRadius: colors.radius,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 10,
+      overflow: "hidden",
+    },
+    cameraButtonText: {
+      fontSize: 16,
+      fontFamily: "Inter_600SemiBold",
+      color: "#FFFFFF",
     },
     galleryButton: {
       height: 50,
@@ -373,38 +385,6 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
     },
     buttonDisabled: {
       opacity: 0.6,
-    },
-    speciesCard: {
-      backgroundColor: colors.card,
-      borderRadius: colors.radius,
-      padding: 18,
-      borderWidth: 1,
-      borderColor: colors.border,
-      marginBottom: 14,
-      gap: 12,
-    },
-    speciesCardTitle: {
-      fontSize: 15,
-      fontFamily: "Inter_600SemiBold",
-      color: colors.foreground,
-    },
-    speciesGrid: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      gap: 6,
-    },
-    speciesChip: {
-      backgroundColor: colors.softGreen,
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-      borderRadius: 20,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    speciesChipText: {
-      fontSize: 12,
-      fontFamily: "Inter_400Regular",
-      color: colors.primary,
     },
     tips: {
       backgroundColor: colors.card,
