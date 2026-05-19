@@ -15,47 +15,47 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 
 const CONSERVATION_STATUSES = [
-  { label: "Least Concern", color: "#5D9E8A", bg: "#EDF4F1", icon: "checkmark-circle" as const },
-  { label: "Near Threatened", color: "#B8A85A", bg: "#F4F1ED", icon: "warning-outline" as const },
+  { label: "Preocupación menor", color: "#5D9E8A", bg: "#EDF4F1", icon: "checkmark-circle" as const },
+  { label: "Casi amenazada", color: "#B8A85A", bg: "#F4F1ED", icon: "warning-outline" as const },
   { label: "Vulnerable", color: "#E8A598", bg: "#F7F0EE", icon: "alert-circle-outline" as const },
-  { label: "Endangered", color: "#D97066", bg: "#F7EEEE", icon: "alert-circle" as const },
-  { label: "Critically Endangered", color: "#B84040", bg: "#F7EEEE", icon: "close-circle" as const },
+  { label: "En peligro", color: "#D97066", bg: "#F7EEEE", icon: "alert-circle" as const },
+  { label: "En peligro crítico", color: "#B84040", bg: "#F7EEEE", icon: "close-circle" as const },
 ];
 
 const TIPS = [
   {
     icon: "sunny-outline" as const,
-    title: "Best time to observe",
-    text: "Early morning (dawn to 2 hours after) and late afternoon (2 hours before dusk) are peak bird activity periods.",
+    title: "Mejor momento para observar",
+    text: "Temprano en la mañana (amanecer hasta 2 horas después) y al final de la tarde (2 horas antes del anochecer) son los momentos de mayor actividad.",
   },
   {
     icon: "eye-outline" as const,
-    title: "Key identification features",
-    text: "Note size, beak shape, leg length, color patterns, and behavioral traits. Wing markings are often distinctive.",
+    title: "Características clave de identificación",
+    text: "Observa el tamaño, forma del pico, longitud de las patas, patrones de color y comportamiento. Las marcas en las alas suelen ser distintivas.",
   },
   {
     icon: "location-outline" as const,
-    title: "Habitat clues",
-    text: "Birds adapt to specific habitats. A marsh bird in a forest is unusual — location narrows your identification.",
+    title: "Pistas del hábitat",
+    text: "Las aves se adaptan a hábitats específicos. Un ave de pantano en un bosque es inusual — la ubicación ayuda a identificar la especie.",
   },
   {
     icon: "musical-notes-outline" as const,
-    title: "Listen to calls",
-    text: "Many birds are identified by song before sight. Distinctive calls can confirm species even when visually similar.",
+    title: "Escucha los cantos",
+    text: "Muchas aves se identifican por su canto antes que por la vista. Los cantos distintivos pueden confirmar la especie incluso cuando son visualmente similares.",
   },
   {
     icon: "calendar-outline" as const,
-    title: "Seasonal variation",
-    text: "Male birds often have breeding plumage (vibrant) vs winter plumage (duller). Juveniles also look different.",
+    title: "Variación estacional",
+    text: "Los machos suelen tener plumaje nupcial (vivos) frente al plumaje invernal (más apagado). Los juveniles también tienen un aspecto diferente.",
   },
 ];
 
 const FAMILIES = [
-  { name: "Passerines", description: "Perching birds — largest order, includes sparrows, warblers, finches", icon: "bird" },
-  { name: "Raptors", description: "Birds of prey: eagles, hawks, falcons, owls — sharp talons and hooked beaks", icon: "owl" },
-  { name: "Waterfowl", description: "Ducks, geese, swans — webbed feet, flat bills, waterproof plumage", icon: "duck" },
-  { name: "Waders", description: "Herons, storks, flamingos — long legs and necks for shallow water foraging", icon: "bird" },
-  { name: "Seabirds", description: "Gulls, albatrosses, puffins — adapted for open ocean life", icon: "bird" },
+  { name: "Paseriformes", description: "Aves cantoras — el orden más grande, incluye gorriones, currucas y pinzones" },
+  { name: "Rapaces", description: "Aves de presa: águilas, halcones, búhos — garras afiladas y picos ganchudos" },
+  { name: "Aves acuáticas", description: "Patos, gansos, cisnes — patas palmeadas, picos planos y plumaje impermeable" },
+  { name: "Zancudas", description: "Garzas, cigüeñas, flamencos — patas y cuellos largos para vadear aguas poco profundas" },
+  { name: "Aves marinas", description: "Gaviotas, albatros, frailecillos — adaptadas para la vida en mar abierto" },
 ];
 
 export default function GuideScreen() {
@@ -73,12 +73,12 @@ export default function GuideScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.title}>Field Guide</Text>
-          <Text style={styles.subtitle}>Tips for birdwatching & identification</Text>
+          <Text style={styles.title}>Guía de Campo</Text>
+          <Text style={styles.subtitle}>Consejos para la observación e identificación de aves</Text>
         </View>
 
         <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.section}>
-          <Text style={styles.sectionTitle}>Observation Tips</Text>
+          <Text style={styles.sectionTitle}>Consejos de observación</Text>
           {TIPS.map((tip, i) => (
             <Pressable
               key={i}
@@ -104,7 +104,7 @@ export default function GuideScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.section}>
-          <Text style={styles.sectionTitle}>Conservation Status</Text>
+          <Text style={styles.sectionTitle}>Estado de conservación</Text>
           <View style={styles.statusGrid}>
             {CONSERVATION_STATUSES.map((s, i) => (
               <View key={i} style={[styles.statusBadge, { backgroundColor: s.bg }]}>
@@ -116,7 +116,7 @@ export default function GuideScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(300).duration(400)} style={[styles.section, styles.lastSection]}>
-          <Text style={styles.sectionTitle}>Major Bird Families</Text>
+          <Text style={styles.sectionTitle}>Principales familias de aves</Text>
           {FAMILIES.map((f, i) => (
             <View key={i} style={styles.familyCard}>
               <View style={styles.familyIconWrap}>

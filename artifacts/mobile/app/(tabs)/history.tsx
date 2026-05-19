@@ -51,7 +51,7 @@ function HistoryCard({ item, index, colors }: { item: BirdResult; index: number;
               </Text>
             </View>
             <Text style={styles.dateText}>
-              {new Date(item.analyzedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+              {new Date(item.analyzedAt).toLocaleDateString("es-ES", { month: "short", day: "numeric" })}
             </Text>
           </View>
         </View>
@@ -77,10 +77,10 @@ export default function HistoryScreen() {
       />
 
       <View style={styles.header}>
-        <Text style={styles.title}>Sightings</Text>
+        <Text style={styles.title}>Avistamientos</Text>
         {history.length > 0 && (
           <Pressable onPress={clearHistory} style={styles.clearBtn}>
-            <Text style={styles.clearText}>Clear all</Text>
+            <Text style={styles.clearText}>Borrar todo</Text>
           </Pressable>
         )}
       </View>
@@ -97,8 +97,8 @@ export default function HistoryScreen() {
         ListEmptyComponent={
           <View style={styles.empty}>
             <Ionicons name="binoculars-outline" size={52} color={colors.mutedForeground} />
-            <Text style={styles.emptyTitle}>No sightings yet</Text>
-            <Text style={styles.emptyText}>Your identified birds will appear here</Text>
+            <Text style={styles.emptyTitle}>Sin avistamientos aún</Text>
+            <Text style={styles.emptyText}>Las aves identificadas aparecerán aquí</Text>
           </View>
         }
       />

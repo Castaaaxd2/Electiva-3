@@ -55,7 +55,7 @@ export default function IdentifyScreen() {
 
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permission needed", "Camera access is required to identify birds.");
+      Alert.alert("Permiso requerido", "Se necesita acceso a la cámara para identificar aves.");
       return;
     }
 
@@ -107,7 +107,7 @@ export default function IdentifyScreen() {
       router.push({ pathname: "/result", params: { resultId: result.analyzedAt } });
     } catch (err) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert("Identification failed", "Could not analyze the image. Please try again.");
+      Alert.alert("Identificación fallida", "No se pudo analizar la imagen. Por favor, inténtalo de nuevo.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -129,7 +129,7 @@ export default function IdentifyScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Animated.View entering={FadeInDown.duration(500)} style={styles.header}>
-          <Text style={styles.tagline}>Point. Shoot. Discover.</Text>
+          <Text style={styles.tagline}>Apunta. Fotografía. Descubre.</Text>
           <Text style={styles.title}>BirdLens</Text>
         </Animated.View>
 
@@ -139,7 +139,7 @@ export default function IdentifyScreen() {
             {isAnalyzing && (
               <View style={styles.analyzingOverlay}>
                 <ActivityIndicator size="large" color="#FFFFFF" />
-                <Text style={styles.analyzingText}>Analyzing bird...</Text>
+                <Text style={styles.analyzingText}>Analizando ave...</Text>
               </View>
             )}
           </Animated.View>
@@ -147,8 +147,8 @@ export default function IdentifyScreen() {
           <Animated.View entering={FadeInDown.delay(200).duration(500)} style={styles.placeholder}>
             <View style={styles.placeholderInner}>
               <Ionicons name="camera" size={56} color={colors.primary} />
-              <Text style={styles.placeholderTitle}>No photo yet</Text>
-              <Text style={styles.placeholderText}>Take or upload a photo to identify a bird species</Text>
+              <Text style={styles.placeholderTitle}>Sin foto</Text>
+              <Text style={styles.placeholderText}>Toma o sube una foto para identificar una especie de ave</Text>
             </View>
           </Animated.View>
         )}
@@ -167,7 +167,7 @@ export default function IdentifyScreen() {
                 end={{ x: 1, y: 1 }}
               />
               <Ionicons name="camera" size={22} color="#FFFFFF" />
-              <Text style={styles.primaryButtonText}>Open Camera</Text>
+              <Text style={styles.primaryButtonText}>Abrir Cámara</Text>
             </Pressable>
           </Animated.View>
 
@@ -177,23 +177,23 @@ export default function IdentifyScreen() {
             disabled={isAnalyzing}
           >
             <Ionicons name="image-outline" size={20} color={colors.primary} />
-            <Text style={styles.secondaryButtonText}>Choose from Gallery</Text>
+            <Text style={styles.secondaryButtonText}>Elegir de la Galería</Text>
           </Pressable>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(400).duration(500)} style={styles.tips}>
-          <Text style={styles.tipsTitle}>Tips for best results</Text>
+          <Text style={styles.tipsTitle}>Consejos para mejores resultados</Text>
           <View style={styles.tipRow}>
             <View style={styles.tipDot} />
-            <Text style={styles.tipText}>Ensure the bird is clearly visible and in focus</Text>
+            <Text style={styles.tipText}>Asegúrate de que el ave sea claramente visible y esté enfocada</Text>
           </View>
           <View style={styles.tipRow}>
             <View style={styles.tipDot} />
-            <Text style={styles.tipText}>Good lighting improves accuracy significantly</Text>
+            <Text style={styles.tipText}>Una buena iluminación mejora significativamente la precisión</Text>
           </View>
           <View style={styles.tipRow}>
             <View style={styles.tipDot} />
-            <Text style={styles.tipText}>Capture distinctive markings like wing patterns</Text>
+            <Text style={styles.tipText}>Captura marcas distintivas como patrones de alas</Text>
           </View>
         </Animated.View>
       </ScrollView>

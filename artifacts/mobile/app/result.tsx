@@ -91,7 +91,7 @@ export default function ResultScreen() {
   if (!result) {
     return (
       <View style={[styles.container, { alignItems: "center", justifyContent: "center" }]}>
-        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular" }}>Result not found</Text>
+        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular" }}>Resultado no encontrado</Text>
       </View>
     );
   }
@@ -141,7 +141,7 @@ export default function ResultScreen() {
             <View style={[styles.confidenceBig, { backgroundColor: confidenceColor + "22" }]}>
               <Ionicons name="checkmark-circle" size={16} color={confidenceColor} />
               <Text style={[styles.confidenceBigText, { color: confidenceColor }]}>
-                {confidence.toFixed(1)}% confidence
+                {confidence.toFixed(1)}% de confianza
               </Text>
             </View>
             <View style={styles.statusBadge}>
@@ -151,18 +151,18 @@ export default function ResultScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(150).duration(400)} style={styles.card}>
-          <Text style={styles.cardTitle}>About this species</Text>
+          <Text style={styles.cardTitle}>Sobre esta especie</Text>
           <Text style={styles.descriptionText}>{result.description}</Text>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.pillGrid}>
-          <InfoPill icon="leaf-outline" label="Habitat" value={result.habitat} colors={colors} />
-          <InfoPill icon="restaurant-outline" label="Diet" value={result.diet} colors={colors} />
+          <InfoPill icon="leaf-outline" label="Hábitat" value={result.habitat} colors={colors} />
+          <InfoPill icon="restaurant-outline" label="Alimentación" value={result.diet} colors={colors} />
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(250).duration(400)} style={styles.card}>
-          <Text style={styles.cardTitle}>Prediction accuracy</Text>
-          <Text style={styles.cardSubtitle}>All possible species matches</Text>
+          <Text style={styles.cardTitle}>Precisión de predicción</Text>
+          <Text style={styles.cardSubtitle}>Todas las posibles coincidencias de especie</Text>
           {result.allPredictions.map((pred, i) => (
             <ConfidenceBar
               key={i}
@@ -176,7 +176,7 @@ export default function ResultScreen() {
 
         <Animated.View entering={FadeInDown.delay(350).duration(400)}>
           <Text style={styles.timestampText}>
-            Identified on {new Date(result.analyzedAt).toLocaleString()}
+            Identificado el {new Date(result.analyzedAt).toLocaleString("es-ES")}
           </Text>
         </Animated.View>
       </ScrollView>
