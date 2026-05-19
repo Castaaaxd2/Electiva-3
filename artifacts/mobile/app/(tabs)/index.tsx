@@ -38,20 +38,20 @@ export default function IdentifyScreen() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const buttonScale = useSharedValue(1);
+  const analyzeButtonScale = useSharedValue(1);
   const imageScale = useSharedValue(1);
 
-  const animatedButtonStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: buttonScale.value }],
+  const animatedAnalyzeStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: analyzeButtonScale.value }],
   }));
 
   const animatedImageStyle = useAnimatedStyle(() => ({
     transform: [{ scale: imageScale.value }],
   }));
 
-  const handleCameraPress = useCallback(async () => {
+  const handleAnalyzePress = useCallback(async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    buttonScale.value = withSequence(withSpring(0.94), withSpring(1));
+    analyzeButtonScale.value = withSequence(withSpring(0.94), withSpring(1));
 
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
@@ -131,6 +131,7 @@ export default function IdentifyScreen() {
         <Animated.View entering={FadeInDown.duration(500)} style={styles.header}>
           <Text style={styles.tagline}>Apunta. Fotografía. Descubre.</Text>
           <Text style={styles.title}>BirdLens</Text>
+          <Text style={styles.subtitle}>32 especies identificables</Text>
         </Animated.View>
 
         {selectedImage ? (
@@ -139,8 +140,14 @@ export default function IdentifyScreen() {
             {isAnalyzing && (
               <View style={styles.analyzingOverlay}>
                 <ActivityIndicator size="large" color="#FFFFFF" />
-                <Text style={styles.analyzingText}>Analizando ave...</Text>
+                <Text style={styles.analyzingText}>Analizando especie...</Text>
               </View>
+            )}
+            {!isAnalyzing && (
+              <Pressable style={styles.retakeButton} onPress={handleAnalyzePress}>
+                <Ionicons name="camera" size={16} color="#FFFFFF" />
+                <Text style={styles.retakeText}>Nueva foto</Text>
+              </Pressable>
             )}
           </Animated.View>
         ) : (
@@ -153,11 +160,12 @@ export default function IdentifyScreen() {
           </Animated.View>
         )}
 
+        {/* Botón principal: Analizar especie */}
         <Animated.View entering={FadeInDown.delay(300).duration(500)} style={styles.actions}>
-          <Animated.View style={animatedButtonStyle}>
+          <Animated.View style={animatedAnalyzeStyle}>
             <Pressable
-              style={[styles.primaryButton, isAnalyzing && styles.buttonDisabled]}
-              onPress={handleCameraPress}
+              style={[styles.analyzeButton, isAnalyzing && styles.buttonDisabled]}
+              onPress={handleAnalyzePress}
               disabled={isAnalyzing}
             >
               <LinearGradient
@@ -166,22 +174,40 @@ export default function IdentifyScreen() {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               />
-              <Ionicons name="camera" size={22} color="#FFFFFF" />
-              <Text style={styles.primaryButtonText}>Abrir Cámara</Text>
+              {isAnalyzing ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
+                <Ionicons name="scan" size={22} color="#FFFFFF" />
+              )}
+              <Text style={styles.analyzeButtonText}>
+                {isAnalyzing ? "Analizando..." : "Analizar especie"}
+              </Text>
             </Pressable>
           </Animated.View>
 
           <Pressable
-            style={[styles.secondaryButton, isAnalyzing && styles.buttonDisabled]}
+            style={[styles.galleryButton, isAnalyzing && styles.buttonDisabled]}
             onPress={handleGalleryPress}
             disabled={isAnalyzing}
           >
             <Ionicons name="image-outline" size={20} color={colors.primary} />
-            <Text style={styles.secondaryButtonText}>Elegir de la Galería</Text>
+            <Text style={styles.galleryButtonText}>Elegir de la Galería</Text>
           </Pressable>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(400).duration(500)} style={styles.tips}>
+        {/* Especies disponibles */}
+        <Animated.View entering={FadeInDown.delay(400).duration(500)} style={styles.speciesCard}>
+          <Text style={styles.speciesCardTitle}>Especies del dataset</Text>
+          <View style={styles.speciesGrid}>
+            {BIRD_SPECIES_PREVIEW.map((name, i) => (
+              <View key={i} style={styles.speciesChip}>
+                <Text style={styles.speciesChipText}>{name}</Text>
+              </View>
+            ))}
+          </View>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(500).duration(500)} style={styles.tips}>
           <Text style={styles.tipsTitle}>Consejos para mejores resultados</Text>
           <View style={styles.tipRow}>
             <View style={styles.tipDot} />
@@ -201,6 +227,15 @@ export default function IdentifyScreen() {
   );
 }
 
+const BIRD_SPECIES_PREVIEW = [
+  "Canario costeño", "Caracara plancus", "Carpinterito Oliváceo",
+  "Copetón", "Cucarachero común", "Colibrí Cola Canela",
+  "Garza ganadera", "Gavilán caminero", "Luis Bienteveo",
+  "Loro Cabeciazul", "Mirla patinaranja", "Perico carisucio",
+  "Tangara Azulegris", "Tangara dorada", "Tirano Pirirí",
+  "Tortolita común", "Zorzal Sabiá", "+ 15 más...",
+];
+
 function makeStyles(colors: ReturnType<typeof useColors>) {
   return StyleSheet.create({
     container: {
@@ -208,35 +243,41 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       backgroundColor: colors.background,
     },
     scrollContent: {
-      paddingHorizontal: 24,
+      paddingHorizontal: 20,
       paddingBottom: 120,
     },
     header: {
       marginTop: 16,
-      marginBottom: 28,
+      marginBottom: 24,
     },
     tagline: {
-      fontSize: 13,
+      fontSize: 12,
       fontFamily: "Inter_500Medium",
       color: colors.primary,
       letterSpacing: 1.2,
       textTransform: "uppercase",
     },
     title: {
-      fontSize: 36,
+      fontSize: 34,
       fontFamily: "Inter_700Bold",
       color: colors.foreground,
       marginTop: 4,
     },
+    subtitle: {
+      fontSize: 13,
+      fontFamily: "Inter_400Regular",
+      color: colors.mutedForeground,
+      marginTop: 2,
+    },
     placeholder: {
-      height: 240,
+      height: 220,
       borderRadius: colors.radius,
       backgroundColor: colors.card,
       overflow: "hidden",
       borderWidth: 1.5,
       borderColor: colors.border,
       borderStyle: "dashed",
-      marginBottom: 24,
+      marginBottom: 20,
     },
     placeholderInner: {
       flex: 1,
@@ -257,10 +298,10 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       paddingHorizontal: 32,
     },
     imageContainer: {
-      height: 260,
+      height: 240,
       borderRadius: colors.radius,
       overflow: "hidden",
-      marginBottom: 24,
+      marginBottom: 20,
     },
     selectedImage: {
       width: "100%",
@@ -278,12 +319,29 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       fontSize: 16,
       fontFamily: "Inter_500Medium",
     },
-    actions: {
-      gap: 12,
-      marginBottom: 32,
+    retakeButton: {
+      position: "absolute",
+      bottom: 12,
+      right: 12,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingHorizontal: 12,
+      paddingVertical: 7,
+      borderRadius: 20,
     },
-    primaryButton: {
-      height: 58,
+    retakeText: {
+      color: "#FFFFFF",
+      fontSize: 13,
+      fontFamily: "Inter_500Medium",
+    },
+    actions: {
+      gap: 10,
+      marginBottom: 24,
+    },
+    analyzeButton: {
+      height: 62,
       borderRadius: colors.radius,
       flexDirection: "row",
       alignItems: "center",
@@ -291,13 +349,14 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       gap: 10,
       overflow: "hidden",
     },
-    primaryButtonText: {
-      fontSize: 16,
-      fontFamily: "Inter_600SemiBold",
+    analyzeButtonText: {
+      fontSize: 17,
+      fontFamily: "Inter_700Bold",
       color: "#FFFFFF",
+      letterSpacing: 0.3,
     },
-    secondaryButton: {
-      height: 52,
+    galleryButton: {
+      height: 50,
       borderRadius: colors.radius,
       borderWidth: 1.5,
       borderColor: colors.primary,
@@ -307,7 +366,7 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       gap: 8,
       backgroundColor: colors.softGreen,
     },
-    secondaryButtonText: {
+    galleryButtonText: {
       fontSize: 15,
       fontFamily: "Inter_500Medium",
       color: colors.primary,
@@ -315,10 +374,42 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
     buttonDisabled: {
       opacity: 0.6,
     },
+    speciesCard: {
+      backgroundColor: colors.card,
+      borderRadius: colors.radius,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 14,
+      gap: 12,
+    },
+    speciesCardTitle: {
+      fontSize: 15,
+      fontFamily: "Inter_600SemiBold",
+      color: colors.foreground,
+    },
+    speciesGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 6,
+    },
+    speciesChip: {
+      backgroundColor: colors.softGreen,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    speciesChipText: {
+      fontSize: 12,
+      fontFamily: "Inter_400Regular",
+      color: colors.primary,
+    },
     tips: {
       backgroundColor: colors.card,
       borderRadius: colors.radius,
-      padding: 20,
+      padding: 18,
       gap: 10,
       borderWidth: 1,
       borderColor: colors.border,

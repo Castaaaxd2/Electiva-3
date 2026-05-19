@@ -22,6 +22,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useColors } from "@/hooks/useColors";
 import { useBirdStore } from "@/context/BirdStore";
+import { lookupSpecies } from "@/data/species";
 
 function ConfidenceBar({ label, confidence, delay, colors }: {
   label: string;
@@ -86,6 +87,24 @@ export default function ResultScreen() {
     [history, resultId]
   );
 
+  // Busca la especie en el dataset local de 32 especies
+  const localSpeciesData = useMemo(() => {
+    if (!result) return undefined;
+    return lookupSpecies(result.topPrediction.commonName) ??
+           lookupSpecies(result.topPrediction.species) ??
+           lookupSpecies(result.topPrediction.scientificName);
+  }, [result]);
+
+  // Usa datos del dataset local si está disponible, si no usa los de la IA
+  const speciesInfo = localSpeciesData ?? (result ? {
+    description: result.description,
+    habitat: result.habitat,
+    diet: result.diet,
+    conservationStatus: result.conservationStatus,
+  } : null);
+
+  const isFromDataset = !!localSpeciesData;
+
   const styles = makeStyles(colors);
 
   if (!result) {
@@ -144,20 +163,36 @@ export default function ResultScreen() {
                 {confidence.toFixed(1)}% de confianza
               </Text>
             </View>
-            <View style={styles.statusBadge}>
-              <Text style={styles.statusText}>{result.conservationStatus}</Text>
+            <View style={[styles.statusBadge, isFromDataset && styles.datasetBadge]}>
+              {isFromDataset && <Ionicons name="library-outline" size={12} color={colors.primary} />}
+              <Text style={[styles.statusText, isFromDataset && styles.datasetBadgeText]}>
+                {isFromDataset ? "En tu dataset" : speciesInfo?.conservationStatus ?? ""}
+              </Text>
             </View>
           </View>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(150).duration(400)} style={styles.card}>
-          <Text style={styles.cardTitle}>Sobre esta especie</Text>
-          <Text style={styles.descriptionText}>{result.description}</Text>
+          <View style={styles.cardTitleRow}>
+            <Text style={styles.cardTitle}>Sobre esta especie</Text>
+            {isFromDataset && (
+              <View style={styles.datasetTag}>
+                <Text style={styles.datasetTagText}>Dataset propio</Text>
+              </View>
+            )}
+          </View>
+          <Text style={styles.descriptionText}>{speciesInfo?.description}</Text>
+          {isFromDataset && (
+            <View style={styles.conservationRow}>
+              <Ionicons name="shield-checkmark-outline" size={14} color={colors.primary} />
+              <Text style={styles.conservationText}>Estado: {speciesInfo?.conservationStatus}</Text>
+            </View>
+          )}
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.pillGrid}>
-          <InfoPill icon="leaf-outline" label="Hábitat" value={result.habitat} colors={colors} />
-          <InfoPill icon="restaurant-outline" label="Alimentación" value={result.diet} colors={colors} />
+          <InfoPill icon="leaf-outline" label="Hábitat" value={speciesInfo?.habitat ?? "—"} colors={colors} />
+          <InfoPill icon="restaurant-outline" label="Alimentación" value={speciesInfo?.diet ?? "—"} colors={colors} />
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(250).duration(400)} style={styles.card}>
@@ -265,11 +300,22 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       paddingHorizontal: 12,
       paddingVertical: 6,
       borderRadius: 20,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    datasetBadge: {
+      backgroundColor: colors.softGreen,
+      borderWidth: 1,
+      borderColor: colors.primary + "44",
     },
     statusText: {
       fontSize: 13,
       fontFamily: "Inter_500Medium",
       color: colors.mutedForeground,
+    },
+    datasetBadgeText: {
+      color: colors.primary,
     },
     card: {
       backgroundColor: colors.card,
@@ -278,6 +324,11 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       borderWidth: 1,
       borderColor: colors.border,
       gap: 8,
+    },
+    cardTitleRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
     },
     cardTitle: {
       fontSize: 15,
@@ -290,11 +341,33 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       color: colors.mutedForeground,
       marginTop: -4,
     },
+    datasetTag: {
+      backgroundColor: colors.primary + "18",
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 10,
+    },
+    datasetTagText: {
+      fontSize: 11,
+      fontFamily: "Inter_500Medium",
+      color: colors.primary,
+    },
     descriptionText: {
       fontSize: 14,
       fontFamily: "Inter_400Regular",
       color: colors.foreground,
       lineHeight: 22,
+    },
+    conservationRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      marginTop: 4,
+    },
+    conservationText: {
+      fontSize: 13,
+      fontFamily: "Inter_500Medium",
+      color: colors.primary,
     },
     pillGrid: {
       flexDirection: "row",
