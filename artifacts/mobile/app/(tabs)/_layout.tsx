@@ -6,6 +6,7 @@ import { SymbolView } from "expo-symbols";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { Platform, StyleSheet, View, useColorScheme } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useColors } from "@/hooks/useColors";
 
@@ -31,9 +32,14 @@ function NativeTabLayout() {
 function ClassicTabLayout() {
   const colors = useColors();
   const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets();
   const isDark = colorScheme === "dark";
   const isIOS = Platform.OS === "ios";
   const isWeb = Platform.OS === "web";
+
+  // On iOS, the tab bar height accounts for the home indicator (safe area bottom)
+  const tabBarHeight = isWeb ? 84 : isIOS ? 50 + insets.bottom : 60;
+  const tabBarPaddingBottom = isWeb ? 34 : isIOS ? insets.bottom : 8;
 
   return (
     <Tabs
@@ -46,21 +52,33 @@ function ClassicTabLayout() {
           backgroundColor: isIOS ? "transparent" : colors.card,
           borderTopWidth: 0,
           elevation: 0,
-          height: isWeb ? 84 : 70,
-          paddingBottom: isWeb ? 34 : 10,
+          height: tabBarHeight,
+          paddingBottom: tabBarPaddingBottom,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontFamily: "Inter_500Medium",
+          fontSize: 11,
         },
         tabBarBackground: () =>
           isIOS ? (
             <BlurView
-              intensity={90}
-              tint={isDark ? "dark" : "light"}
-              style={StyleSheet.absoluteFill}
+              intensity={95}
+              tint={isDark ? "systemChromeMaterialDark" : "systemChromeMaterial"}
+              style={[
+                StyleSheet.absoluteFill,
+                { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
+              ]}
             />
           ) : (
             <View
               style={[
                 StyleSheet.absoluteFill,
-                { backgroundColor: colors.card, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
+                {
+                  backgroundColor: colors.card,
+                  borderTopWidth: StyleSheet.hairlineWidth,
+                  borderTopColor: colors.border,
+                },
               ]}
             />
           ),
@@ -70,11 +88,11 @@ function ClassicTabLayout() {
         name="index"
         options={{
           title: "Identificar",
-          tabBarIcon: ({ color }) =>
+          tabBarIcon: ({ color, size }) =>
             isIOS ? (
-              <SymbolView name="camera" tintColor={color} size={24} />
+              <SymbolView name="camera" tintColor={color} size={size} />
             ) : (
-              <Ionicons name="camera-outline" size={24} color={color} />
+              <Ionicons name="camera-outline" size={size} color={color} />
             ),
         }}
       />
@@ -82,11 +100,11 @@ function ClassicTabLayout() {
         name="history"
         options={{
           title: "Historial",
-          tabBarIcon: ({ color }) =>
+          tabBarIcon: ({ color, size }) =>
             isIOS ? (
-              <SymbolView name="clock" tintColor={color} size={24} />
+              <SymbolView name="clock" tintColor={color} size={size} />
             ) : (
-              <Ionicons name="time-outline" size={24} color={color} />
+              <Ionicons name="time-outline" size={size} color={color} />
             ),
         }}
       />
@@ -94,11 +112,11 @@ function ClassicTabLayout() {
         name="guide"
         options={{
           title: "Guía",
-          tabBarIcon: ({ color }) =>
+          tabBarIcon: ({ color, size }) =>
             isIOS ? (
-              <SymbolView name="book" tintColor={color} size={24} />
+              <SymbolView name="book" tintColor={color} size={size} />
             ) : (
-              <MaterialCommunityIcons name="bird" size={24} color={color} />
+              <MaterialCommunityIcons name="bird" size={size} color={color} />
             ),
         }}
       />

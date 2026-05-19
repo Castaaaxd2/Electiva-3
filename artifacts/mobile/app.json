@@ -15,16 +15,24 @@
     },
     "ios": {
       "supportsTablet": false,
+      "bundleIdentifier": "com.birdlens.app",
       "infoPlist": {
-        "NSCameraUsageDescription": "BirdLens uses the camera to photograph birds for species identification.",
-        "NSPhotoLibraryUsageDescription": "BirdLens accesses your photo library to identify birds from existing photos."
+        "NSCameraUsageDescription": "BirdLens usa la cámara para fotografiar aves e identificar su especie.",
+        "NSPhotoLibraryUsageDescription": "BirdLens accede a tu galería para identificar aves desde fotos existentes.",
+        "NSPhotoLibraryAddUsageDescription": "BirdLens puede guardar fotos de aves en tu galería."
       }
     },
     "android": {
+      "package": "com.birdlens.app",
       "permissions": [
         "android.permission.CAMERA",
-        "android.permission.READ_EXTERNAL_STORAGE"
-      ]
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_IMAGES"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#F7F3EE"
+      }
     },
     "web": {
       "favicon": "./assets/images/icon.png"
@@ -41,8 +49,9 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "BirdLens accesses your photo library to identify birds from existing photos.",
-          "cameraPermission": "BirdLens uses your camera to photograph birds for species identification."
+          "photosPermission": "BirdLens accede a tu galería para identificar aves desde fotos existentes.",
+          "cameraPermission": "BirdLens usa la cámara para fotografiar aves e identificar su especie.",
+          "savePhotosPermission": "BirdLens puede guardar fotos de aves en tu galería."
         }
       ]
     ],
