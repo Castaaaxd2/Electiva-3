@@ -11,3 +11,9 @@ id = "Ch5YXHiAaL6Kpr2I1LjTo"
 uri = "file://BirdLens.zip"
 type = "unspecified"
 title = "BirdLens — Proyecto completo"
+
+[[outputs]]
+id = "FJv_5sU1K4Pq8-knvVSsV"
+uri = "file://dependencias.txt"
+type = "text"
+title = "BirdLens — Dependencias del proyecto"

@@ -1,0 +1,158 @@
+========================================
+  BirdLens — Dependencias del proyecto
+========================================
+
+REQUISITO PREVIO
+----------------
+Node.js >= 20
+pnpm >= 9
+
+  Instalar pnpm (si no lo tienes):
+  npm install -g pnpm
+
+  Instalar todas las dependencias del proyecto:
+  pnpm install
+
+
+========================================
+  APP MÓVIL (artifacts/mobile)
+========================================
+
+Framework y runtime
+-------------------
+expo                          ~54.0.27
+expo-router                   ~6.0.17
+react                         19.x
+react-native                  0.81.5
+react-dom                     19.x
+react-native-web              ^0.21.0
+typescript                    ~5.9.2
+
+Navegación y pantallas
+----------------------
+react-native-screens          ~4.16.0
+react-native-safe-area-context ~5.6.0
+react-native-gesture-handler  ~2.28.0
+
+Animaciones
+-----------
+react-native-reanimated        ~4.1.1
+react-native-worklets          0.5.1
+
+UI y componentes visuales
+--------------------------
+expo-linear-gradient           ~15.0.8
+expo-blur                      ~15.0.8
+expo-glass-effect              ~0.1.4
+expo-symbols                   ~1.0.8
+@expo/vector-icons             ^15.0.3
+@expo-google-fonts/inter       ^0.4.0
+react-native-svg               15.12.1
+
+Cámara y galería
+----------------
+expo-image-picker              ~17.0.9
+expo-image                     ~3.0.11
+
+Almacenamiento
+--------------
+@react-native-async-storage/async-storage  2.2.0
+
+Funcionalidades nativas
+-----------------------
+expo-haptics                   ~15.0.8
+expo-location                  ~19.0.8
+expo-linking                   ~8.0.10
+expo-constants                 ~18.0.11
+expo-status-bar                ~3.0.9
+expo-system-ui                 ~6.0.9
+expo-web-browser               ~15.0.10
+expo-splash-screen             ~31.0.12
+expo-font                      ~14.0.10
+
+Data fetching
+-------------
+@tanstack/react-query          5.x
+
+Validación
+----------
+zod                            3.x
+zod-validation-error           ^3.4.0
+
+Dev tools
+---------
+@expo/cli                      54.0.23
+@expo/ngrok                    ^4.1.0
+babel-plugin-react-compiler    ^19.0.0-beta
+@babel/core                    ^7.25.2
+@types/react                   ~19.1.10
+@types/react-dom               ~19.1.7
+
+
+========================================
+  SERVIDOR API (artifacts/api-server)
+========================================
+
+Runtime y framework
+-------------------
+express                        ^5.2.1   (Express 5)
+Node.js                        >= 20
+
+Base de datos
+-------------
+drizzle-orm                    (ver pnpm-workspace.yaml)
+PostgreSQL                     (conexión via DATABASE_URL)
+
+Logging
+-------
+pino                           ^9.14.0
+pino-http                      ^10.5.0
+
+Utilidades
+----------
+cors                           ^2.8.6
+cookie-parser                  ^1.4.7
+
+Build
+-----
+esbuild                        0.27.3
+esbuild-plugin-pino            ^2.3.3
+pino-pretty                    ^13.1.3
+
+Dev types
+---------
+@types/express                 ^5.0.6
+@types/cors                    ^2.8.19
+@types/cookie-parser           ^1.4.10
+@types/node                    (ver catalog)
+
+
+========================================
+  VARIABLES DE ENTORNO REQUERIDAS
+========================================
+
+API Server:
+  DATABASE_URL          — Cadena de conexión a PostgreSQL
+  SESSION_SECRET        — Secreto para sesiones
+  AI_INTEGRATIONS_OPENAI_BASE_URL  — Auto-provisto por Replit AI Integrations
+  AI_INTEGRATIONS_OPENAI_API_KEY   — Auto-provisto por Replit AI Integrations
+
+  Opcional (modelo personalizado):
+  MODEL_SERVER_URL      — URL del servidor Python con el modelo entrenado
+                          Ejemplo: http://localhost:5001
+
+
+========================================
+  COMANDOS ÚTILES
+========================================
+
+  pnpm install                          Instalar todas las dependencias
+  pnpm --filter @workspace/mobile run dev       Iniciar app móvil (Expo)
+  pnpm --filter @workspace/api-server run dev   Iniciar servidor API
+  pnpm run typecheck                    Verificar tipos TypeScript
+  pnpm run build                        Build completo del proyecto
+  pnpm --filter @workspace/db run push  Aplicar cambios al esquema de BD
+
+  Expo Go (para probar en físico):
+    1. Instalar "Expo Go" desde App Store (iOS) o Play Store (Android)
+    2. Escanear el QR que aparece al ejecutar el dev server
