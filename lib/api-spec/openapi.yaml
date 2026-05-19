@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: birds
+    description: Bird recognition operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,52 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /birds/identify:
+    post:
+      operationId: identifyBird
+      tags: [birds]
+      summary: Identify bird from image
+      description: Analyzes an image and returns bird species identification with confidence scores
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BirdIdentifyRequest"
+      responses:
+        "200":
+          description: Bird identification result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BirdIdentifyResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /birds/history:
+    get:
+      operationId: getBirdHistory
+      tags: [birds]
+      summary: Get identification history
+      description: Returns a list of past bird identifications
+      responses:
+        "200":
+          description: List of past identifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BirdHistoryItem"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +81,102 @@ components:
           type: string
       required:
         - status
-
+    BirdIdentifyRequest:
+      type: object
+      properties:
+        imageBase64:
+          type: string
+          description: Base64-encoded image data
+      required:
+        - imageBase64
+    BirdPrediction:
+      type: object
+      properties:
+        species:
+          type: string
+        confidence:
+          type: number
+          description: Confidence percentage 0-100
+        commonName:
+          type: string
+        scientificName:
+          type: string
+      required:
+        - species
+        - confidence
+        - commonName
+        - scientificName
+    BirdIdentifyResponse:
+      type: object
+      properties:
+        topPrediction:
+          $ref: "#/components/schemas/BirdPrediction"
+        allPredictions:
+          type: array
+          items:
+            $ref: "#/components/schemas/BirdPrediction"
+        description:
+          type: string
+        habitat:
+          type: string
+        diet:
+          type: string
+        conservationStatus:
+          type: string
+        imageBase64:
+          type: string
+          description: The analyzed image echoed back (optional)
+        analyzedAt:
+          type: string
+          format: date-time
+      required:
+        - topPrediction
+        - allPredictions
+        - description
+        - habitat
+        - diet
+        - conservationStatus
+        - analyzedAt
+    BirdHistoryItem:
+      type: object
+      properties:
+        id:
+          type: string
+        topPrediction:
+          $ref: "#/components/schemas/BirdPrediction"
+        allPredictions:
+          type: array
+          items:
+            $ref: "#/components/schemas/BirdPrediction"
+        description:
+          type: string
+        habitat:
+          type: string
+        diet:
+          type: string
+        conservationStatus:
+          type: string
+        imageBase64:
+          type: string
+        analyzedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - topPrediction
+        - allPredictions
+        - description
+        - habitat
+        - diet
+        - conservationStatus
+        - analyzedAt
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required:
+        - error
+        - message
