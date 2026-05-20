@@ -74,6 +74,42 @@ async function enrichWithOpenAI(speciesName: string): Promise<{
   }
 }
 
+// Lista oficial de las 32 especies del dataset estudiado
+const DATASET_SPECIES = [
+  "Canario costeño",
+  "Caracara plancus",
+  "Carpinterito Oliváceo",
+  "Carpintero Coronirrojo",
+  "Centzontle Tropical",
+  "Chulo",
+  "Colibrí Cola Canela",
+  "Colibrí cola de raqueta",
+  "Copetón",
+  "Cucarachero común",
+  "Eufonia Piquigruesa",
+  "Garza ganadera",
+  "Garza Ganadera Occidental",
+  "Gavilán caminero",
+  "Golondrina azul y blanco",
+  "Golondrina Yucateca",
+  "Loro Cabeciazul",
+  "Luis Bienteveo",
+  "Mango Gorjinegro",
+  "Mirla patinaranja",
+  "Paloma doméstica",
+  "Papamoscas Rayado Chico",
+  "Perico carisucio",
+  "Rascón Chiricote",
+  "Semillero común",
+  "Tangara Azulegris",
+  "Tangara dorada",
+  "Tirano Pirirí",
+  "Tordo negro",
+  "Tortolita común",
+  "Vireón Cejas Canela",
+  "Zorzal Sabiá",
+];
+
 // ─── Identificación completa con OpenAI (fallback) ────────────────────────────
 async function identifyWithOpenAI(imageBase64: string): Promise<Record<string, unknown>> {
   const response = await openai.chat.completions.create({
@@ -87,12 +123,16 @@ async function identifyWithOpenAI(imageBase64: string): Promise<Record<string, u
             type: "text",
             text: `Eres un ornitólogo experto con IA. Analiza esta imagen e identifica la especie de ave.
 
+IMPORTANTE: El sistema tiene un dataset con estas 32 especies específicas. Si el ave en la imagen corresponde a alguna de ellas, DEBES usar EXACTAMENTE ese nombre en "commonName" y "species" (sin cambios, sin traducción, sin sinónimos):
+
+${DATASET_SPECIES.map((s, i) => `${i + 1}. ${s}`).join("\n")}
+
 Devuelve SOLO un JSON válido (sin markdown, sin bloques de código) con esta estructura exacta:
 {
   "topPrediction": {
-    "species": "nombre común",
-    "commonName": "nombre común completo",
-    "scientificName": "nombre científico",
+    "species": "nombre común exacto del dataset si coincide, o nombre en español si no está en el dataset",
+    "commonName": "nombre común exacto del dataset si coincide, o nombre en español si no está en el dataset",
+    "scientificName": "nombre científico en latín",
     "confidence": 87.5
   },
   "allPredictions": [
