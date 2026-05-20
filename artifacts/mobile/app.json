@@ -19,7 +19,8 @@
       "infoPlist": {
         "NSCameraUsageDescription": "BirdLens usa la cámara para fotografiar aves e identificar su especie.",
         "NSPhotoLibraryUsageDescription": "BirdLens accede a tu galería para identificar aves desde fotos existentes.",
-        "NSPhotoLibraryAddUsageDescription": "BirdLens puede guardar fotos de aves en tu galería."
+        "NSPhotoLibraryAddUsageDescription": "BirdLens puede guardar fotos de aves en tu galería.",
+        "NSLocationWhenInUseUsageDescription": "BirdLens registra tu ubicación GPS al identificar un ave para guardarla en el mapa de avistamientos."
       }
     },
     "android": {
@@ -28,11 +29,13 @@
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.READ_MEDIA_IMAGES",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#F7F3EE"
+        "backgroundColor": "#F4F7F0"
       }
     },
     "web": {
@@ -47,6 +50,12 @@
       ],
       "expo-font",
       "expo-web-browser",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "BirdLens registra tu ubicación GPS al identificar un ave para guardarla en el mapa de avistamientos."
+        }
+      ],
       [
         "expo-image-picker",
         {

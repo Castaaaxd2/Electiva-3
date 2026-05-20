@@ -21,9 +21,13 @@ function NativeTabLayout() {
         <Icon sf={{ default: "clock", selected: "clock.fill" }} />
         <Label>Historial</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="map">
+        <Icon sf={{ default: "map", selected: "map.fill" }} />
+        <Label>Mapa</Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="guide">
         <Icon sf={{ default: "book", selected: "book.fill" }} />
-        <Label>Guía</Label>
+        <Label>Catálogo</Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );
@@ -37,7 +41,6 @@ function ClassicTabLayout() {
   const isIOS = Platform.OS === "ios";
   const isWeb = Platform.OS === "web";
 
-  // On iOS, the tab bar height accounts for the home indicator (safe area bottom)
   const tabBarHeight = isWeb ? 84 : isIOS ? 50 + insets.bottom : 60;
   const tabBarPaddingBottom = isWeb ? 34 : isIOS ? insets.bottom : 8;
 
@@ -109,9 +112,21 @@ function ClassicTabLayout() {
         }}
       />
       <Tabs.Screen
+        name="map"
+        options={{
+          title: "Mapa",
+          tabBarIcon: ({ color, size }) =>
+            isIOS ? (
+              <SymbolView name="map" tintColor={color} size={size} />
+            ) : (
+              <Ionicons name="map-outline" size={size} color={color} />
+            ),
+        }}
+      />
+      <Tabs.Screen
         name="guide"
         options={{
-          title: "Guía",
+          title: "Catálogo",
           tabBarIcon: ({ color, size }) =>
             isIOS ? (
               <SymbolView name="book" tintColor={color} size={size} />

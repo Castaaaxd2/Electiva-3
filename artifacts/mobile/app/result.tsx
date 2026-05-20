@@ -4,6 +4,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import React, { useMemo } from "react";
 import {
   Image,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -42,7 +43,7 @@ function ConfidenceBar({ label, confidence, delay, colors }: {
     return () => clearTimeout(timer);
   }, [confidence, delay]);
 
-  const barColor = confidence >= 70 ? "#5D9E8A" : confidence >= 40 ? "#E8C598" : "#E8A598";
+  const barColor = confidence >= 70 ? "#80BA27" : confidence >= 40 ? "#E8C598" : "#E8A598";
 
   return (
     <View style={{ gap: 5, marginBottom: 10 }}>
@@ -83,7 +84,7 @@ export default function ResultScreen() {
   const { history } = useBirdStore();
 
   const result = useMemo(
-    () => history.find((r) => r.analyzedAt === resultId) ?? history[0],
+    () => history.find((r) => r.id === resultId || r.analyzedAt === resultId) ?? history[0],
     [history, resultId]
   );
 
@@ -117,7 +118,7 @@ export default function ResultScreen() {
 
   const top = result.topPrediction;
   const confidence = top.confidence;
-  const confidenceColor = confidence >= 80 ? "#5D9E8A" : confidence >= 50 ? "#B8A85A" : "#E8A598";
+  const confidenceColor = confidence >= 80 ? "#80BA27" : confidence >= 50 ? "#B8A85A" : "#E8A598";
 
   return (
     <View style={styles.container}>
@@ -133,7 +134,7 @@ export default function ResultScreen() {
           </View>
         )}
         <LinearGradient
-          colors={["transparent", "rgba(247,243,238,0.95)", "#F7F3EE"]}
+          colors={["transparent", "rgba(244,247,240,0.95)", "#F4F7F0"]}
           style={styles.heroGradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
@@ -208,6 +209,39 @@ export default function ResultScreen() {
             />
           ))}
         </Animated.View>
+
+        {result.location && (
+          <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.card}>
+            <Text style={styles.cardTitle}>Ubicación del avistamiento</Text>
+            <Text style={styles.cardSubtitle}>
+              {result.location.latitude.toFixed(5)}, {result.location.longitude.toFixed(5)}
+            </Text>
+            <View style={styles.navRow}>
+              <Pressable
+                style={[styles.navButton, { backgroundColor: "#4285F4" }]}
+                onPress={() =>
+                  Linking.openURL(
+                    `https://www.google.com/maps/dir/?api=1&destination=${result.location!.latitude},${result.location!.longitude}`
+                  )
+                }
+              >
+                <Ionicons name="navigate-outline" size={16} color="#FFF" />
+                <Text style={styles.navButtonText}>Google Maps</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.navButton, { backgroundColor: "#00C0F3" }]}
+                onPress={() =>
+                  Linking.openURL(
+                    `waze://?ll=${result.location!.latitude},${result.location!.longitude}&navigate=yes`
+                  )
+                }
+              >
+                <Ionicons name="car-outline" size={16} color="#FFF" />
+                <Text style={styles.navButtonText}>Waze</Text>
+              </Pressable>
+            </View>
+          </Animated.View>
+        )}
 
         <Animated.View entering={FadeInDown.delay(350).duration(400)}>
           <Text style={styles.timestampText}>
@@ -372,6 +406,25 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
     pillGrid: {
       flexDirection: "row",
       gap: 10,
+    },
+    navRow: {
+      flexDirection: "row",
+      gap: 10,
+      marginTop: 4,
+    },
+    navButton: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      paddingVertical: 10,
+      borderRadius: 10,
+    },
+    navButtonText: {
+      fontSize: 14,
+      fontFamily: "Inter_600SemiBold",
+      color: "#FFFFFF",
     },
     timestampText: {
       fontSize: 12,

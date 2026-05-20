@@ -1,38 +1,37 @@
 const colors = {
   light: {
-    text: "#2D2825",
-    tint: "#5D9E8A",
+    text: "#2C3E50",
+    tint: "#80BA27",
 
-    background: "#F7F3EE",
-    foreground: "#2D2825",
+    background: "#F4F7F0",
+    foreground: "#2C3E50",
 
     card: "#FFFFFF",
-    cardForeground: "#2D2825",
+    cardForeground: "#2C3E50",
 
-    primary: "#5D9E8A",
+    primary: "#80BA27",
     primaryForeground: "#FFFFFF",
 
-    secondary: "#EDF4F1",
-    secondaryForeground: "#2D6B5A",
+    secondary: "#EBF3D9",
+    secondaryForeground: "#4A7A0A",
 
-    muted: "#EDE8E2",
-    mutedForeground: "#8A7E76",
+    muted: "#E8EDE3",
+    mutedForeground: "#6B7E6A",
 
-    accent: "#E8A598",
-    accentForeground: "#5C2219",
+    accent: "#2C3E50",
+    accentForeground: "#FFFFFF",
 
     destructive: "#D97066",
     destructiveForeground: "#FFFFFF",
 
-    border: "#E4DDD6",
-    input: "#E4DDD6",
+    border: "#D5E0CB",
+    input: "#D5E0CB",
 
-    // Bird app specific
-    sage: "#5D9E8A",
-    coral: "#E8A598",
-    cream: "#F7F3EE",
-    softGreen: "#EDF4F1",
-    warmGray: "#8A7E76",
+    sage: "#80BA27",
+    coral: "#2C3E50",
+    cream: "#F4F7F0",
+    softGreen: "#EBF3D9",
+    warmGray: "#6B7E6A",
   },
 
   radius: 16,

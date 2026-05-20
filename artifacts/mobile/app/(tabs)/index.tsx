@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
+import * as Location from "expo-location";
 import { router } from "expo-router";
 import React, { useState, useCallback } from "react";
 import {
@@ -15,6 +16,7 @@ import {
   ActivityIndicator,
   ScrollView,
 } from "react-native";
+
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -30,6 +32,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { useBirdStore } from "@/context/BirdStore";
 import { identifyBirdFromBase64 } from "@/lib/birdApi";
+
+function generateUUID(): string {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
 
 export default function IdentifyScreen() {
   const colors = useColors();
@@ -100,10 +110,32 @@ export default function IdentifyScreen() {
 
     setIsAnalyzing(true);
     try {
-      const result = await identifyBirdFromBase64(selectedBase64);
+      const id = generateUUID();
+
+      const [locationResult, apiResult] = await Promise.allSettled([
+        (async () => {
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== "granted") return undefined;
+          const pos = await Promise.race<Location.LocationObject | null>([
+            Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
+            new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000)),
+          ]);
+          if (pos && pos.coords) {
+            return { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
+          }
+          return undefined;
+        })(),
+        identifyBirdFromBase64(selectedBase64),
+      ]);
+
+      if (apiResult.status === "rejected") throw apiResult.reason;
+
+      const result = apiResult.value;
+      const location = locationResult.status === "fulfilled" ? locationResult.value : undefined;
+
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      addToHistory({ ...result, imageBase64: selectedBase64 });
-      router.push({ pathname: "/result", params: { resultId: result.analyzedAt } });
+      addToHistory({ ...result, id, imageBase64: selectedBase64, location });
+      router.push({ pathname: "/result", params: { resultId: id } });
     } catch (err) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert("Identificación fallida", "No se pudo analizar la imagen. Por favor, inténtalo de nuevo.");
@@ -122,7 +154,7 @@ export default function IdentifyScreen() {
   return (
     <View style={[styles.container, { paddingTop: Platform.OS === "web" ? insets.top + 67 : insets.top }]}>
       <LinearGradient
-        colors={["#EDF4F1", "#F7F3EE"]}
+        colors={["#EBF3D9", "#F4F7F0"]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -178,7 +210,7 @@ export default function IdentifyScreen() {
                 disabled={isAnalyzing}
               >
                 <LinearGradient
-                  colors={["#6FB3A0", "#5D9E8A"]}
+                  colors={["#92CA3A", "#80BA27"]}
                   style={StyleSheet.absoluteFill}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
@@ -199,7 +231,7 @@ export default function IdentifyScreen() {
           <Animated.View entering={FadeInDown.delay(300).duration(500)} style={styles.actions}>
             <Pressable style={styles.cameraButton} onPress={handleCameraPress}>
               <LinearGradient
-                colors={["#6FB3A0", "#5D9E8A"]}
+                colors={["#92CA3A", "#80BA27"]}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -343,7 +375,7 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       justifyContent: "center",
       gap: 10,
       overflow: "hidden",
-      backgroundColor: "#5D9E8A",
+      backgroundColor: "#80BA27",
     },
     analyzeButtonText: {
       fontSize: 18,
@@ -359,7 +391,7 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       justifyContent: "center",
       gap: 10,
       overflow: "hidden",
-      backgroundColor: "#5D9E8A",
+      backgroundColor: "#80BA27",
     },
     cameraButtonText: {
       fontSize: 16,

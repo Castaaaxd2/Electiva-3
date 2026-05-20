@@ -8,7 +8,13 @@ export interface BirdPrediction {
   confidence: number;
 }
 
+export interface BirdLocation {
+  latitude: number;
+  longitude: number;
+}
+
 export interface BirdResult {
+  id: string;
   topPrediction: BirdPrediction;
   allPredictions: BirdPrediction[];
   description: string;
@@ -17,6 +23,7 @@ export interface BirdResult {
   conservationStatus: string;
   imageBase64?: string;
   analyzedAt: string;
+  location?: BirdLocation;
 }
 
 interface BirdStoreContextType {
