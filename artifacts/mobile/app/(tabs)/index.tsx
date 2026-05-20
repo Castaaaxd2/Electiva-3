@@ -272,7 +272,6 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       overflow: "hidden",
       borderWidth: 1.5,
       borderColor: colors.border,
-      borderStyle: "dashed",
       marginBottom: 20,
     },
     placeholderInner: {
@@ -344,6 +343,7 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       justifyContent: "center",
       gap: 10,
       overflow: "hidden",
+      backgroundColor: "#5D9E8A",
     },
     analyzeButtonText: {
       fontSize: 18,
@@ -359,6 +359,7 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       justifyContent: "center",
       gap: 10,
       overflow: "hidden",
+      backgroundColor: "#5D9E8A",
     },
     cameraButtonText: {
       fontSize: 16,
