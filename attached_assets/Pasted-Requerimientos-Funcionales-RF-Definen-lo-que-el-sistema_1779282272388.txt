@@ -1,0 +1,54 @@
+Requerimientos Funcionales (RF)
+Definen lo que el sistema debe hacer.
+1. Gestión de Inteligencia Artificial y Visión
+• RF01 - Captura de imagen: La app debe permitir capturar fotos en tiempo real
+desde la cámara o seleccionar imágenes de la galería del dispositivo.
+• RF02 - Identificación On-Device: El sistema debe ejecutar el modelo de Deep
+Learning (.tflite) de forma local para identificar las 18 especies de aves sin
+depender de internet.
+• RF03 - Validación Visual: Al identificar, la app debe mostrar la foto del usuario
+junto a una imagen de referencia de la especie predicha para confirmar la
+veracidad.
+• RF04 - Ranking de Probabilidades: El sistema debe presentar las 3 especies
+con mayor probabilidad de coincidencia según el análisis del modelo.
+2. Geolocalización y Navegación
+• RF05 - Georreferenciación Automática: Al guardar un avistamiento, la app
+debe capturar automáticamente las coordenadas GPS (Latitud/Longitud) del
+dispositivo.
+• RF06 - Mapa de Avistamientos: Visualización de un mapa interactivo con
+marcadores (pines) de todos los registros guardados previamente.
+• RF07 - Enlace a Navegación Externa: Al seleccionar un registro previo, la app
+debe permitir abrir Google Maps o Waze con la ruta trazada desde la posición
+actual hasta el punto del avistamiento.
+3. Sincronización y Datos
+• RF08 - Almacenamiento Local (Offline): Los registros (datos + fotos) deben
+guardarse en una base de datos local (SQLite/Room) cuando no haya conexión
+a internet.
+• RF09 - Sincronización Automática: El sistema debe detectar la conexión a
+internet y subir los datos pendientes a una base de datos centralizada (Cloud).
+• RF10 - Consulta de Catálogo: Acceso a una biblioteca de especies con
+información técnica (hábitat, dieta, distribución en el Tolima) cargada desde
+un archivo maestro.
+Requerimientos No Funcionales (RNF)
+Definen cómo debe ser el sistema (atributos de calidad).
+1. Disponibilidad y Rendimiento
+• RNF01 - Operación Offline-First: La funcionalidad crítica (identificación y
+guardado) debe estar disponible al 100% sin conexión a red.
+• RNF02 - Tiempo de Respuesta IA: La inferencia del modelo en el móvil no
+debe superar los 2 segundos para no afectar la experiencia de usuario.
+• RNF03 - Consumo de Batería: El uso del GPS debe ser optimizado (modo High
+Accuracy solo al guardar) para preservar la energía durante jornadas de
+campo.
+2. Usabilidad y Diseño
+• RNF04 - Interfaz Institucional: El diseño debe seguir la guía de estilo de la
+Universidad Cooperativa de Colombia (colores #2C3E50, #80BA27, etc.).
+• RNF05 - Adaptabilidad (Responsividad): La interfaz debe ajustarse a
+diferentes tamaños de pantalla y orientaciones en dispositivos Android.
+3. Seguridad y Persistencia
+• RNF06 - Integridad de los Datos: Uso de identificadores únicos (UUID) para
+evitar duplicados durante la sincronización masiva de múltiples usuarios.
+• RNF07 - Optimización de Almacenamiento: Las imágenes deben ser
+comprimidas antes de guardarse localmente y subirse a la nube para ahorrar
+espacio y datos móviles.
+• RNF08 - Interoperabilidad: Uso de Intents estándar de Android para una
+comunicación fluida con la API de Google Maps
