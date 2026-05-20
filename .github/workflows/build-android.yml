@@ -31,7 +31,7 @@ jobs:
       - name: Instalar EAS CLI
         run: npm install -g eas-cli
 
-      - name: Compilar APK con EAS
+      - name: Compilar APK con EAS (cloud build)
         working-directory: artifacts/mobile
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -40,7 +40,11 @@ jobs:
             --platform android \
             --profile preview \
             --non-interactive \
-            --output ../birdlens.apk
+            --wait \
+            --json 2>/dev/null > /tmp/build_result.json
+          BUILD_URL=$(jq -r '.[0].artifacts.buildUrl // .[0].artifacts.applicationArchiveUrl' /tmp/build_result.json)
+          echo "APK URL: $BUILD_URL"
+          curl -L "$BUILD_URL" -o ../birdlens.apk
 
       - name: Obtener versión de la app
         id: version
