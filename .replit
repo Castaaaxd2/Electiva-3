@@ -1,3 +1,5 @@
+run = "EXPO_TOKEN=JlskSMMheu-LroLXVbhSFAPB1YXZSk2gsNh8iUTj npx expo start"
+
 modules = ["nodejs-24", "python-3.11"]
 
 [deployment]
@@ -32,9 +34,18 @@ localPort = 8082
 externalPort = 3001
 
 [[ports]]
+localPort = 8083
+externalPort = 3003
+
+[[ports]]
 localPort = 18115
 externalPort = 3000
 
 [[ports]]
 localPort = 18116
 externalPort = 3002
+
+[userenv]
+
+[userenv.shared]
+EXPO_TOKEN = "JlskSMMheu-LroLXVbhSFAPB1YXZSk2gsNh8iUTj"
