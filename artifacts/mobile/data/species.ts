@@ -250,7 +250,7 @@ export const SPECIES_DATA: Record<string, SpeciesInfo> = {
     diet: "Semillas de gramíneas y hierbas, ocasionalmente insectos",
     conservationStatus: "Preocupación menor",
   },
-  "tangara azulegris": {
+  "Tangara azulegris": {
     commonName: "Tangara Azulegris",
     scientificName: "Thraupis episcopus",
     description:
@@ -260,7 +260,7 @@ export const SPECIES_DATA: Record<string, SpeciesInfo> = {
     diet: "Frutos, bayas, néctar e insectos ocasionales",
     conservationStatus: "Preocupación menor",
   },
-  "tangara dorada": {
+  "Tangara dorada": {
     commonName: "Tangara Dorada",
     scientificName: "Tangara arthus",
     description:
@@ -270,7 +270,7 @@ export const SPECIES_DATA: Record<string, SpeciesInfo> = {
     diet: "Frutos, bayas, muérdago e insectos",
     conservationStatus: "Preocupación menor",
   },
-  "tirano pirirí": {
+  "Tirano pirirí": {
     commonName: "Tirano Pirirí",
     scientificName: "Tyrannus melancholicus",
     description:
@@ -280,7 +280,7 @@ export const SPECIES_DATA: Record<string, SpeciesInfo> = {
     diet: "Insectos capturados en vuelo, frutos y bayas",
     conservationStatus: "Preocupación menor",
   },
-  "tordo negro": {
+  "Tordo negro": {
     commonName: "Tordo Negro",
     scientificName: "Dives dives",
     description:
@@ -290,7 +290,7 @@ export const SPECIES_DATA: Record<string, SpeciesInfo> = {
     diet: "Insectos, semillas, frutos, granos y restos de comida",
     conservationStatus: "Preocupación menor",
   },
-  "tortolita común": {
+  "Tortolita común": {
     commonName: "Tortolita Común",
     scientificName: "Columbina talpacoti",
     description:
@@ -300,7 +300,7 @@ export const SPECIES_DATA: Record<string, SpeciesInfo> = {
     diet: "Semillas de gramíneas, hierbas pequeñas y granos caídos",
     conservationStatus: "Preocupación menor",
   },
-  "vireón cejas canela": {
+  "Vireón cejas canela": {
     commonName: "Vireón Cejas Canela",
     scientificName: "Cyclarhis gujanensis",
     description:
@@ -310,7 +310,7 @@ export const SPECIES_DATA: Record<string, SpeciesInfo> = {
     diet: "Insectos grandes, larvas, arañas y ocasionalmente frutos",
     conservationStatus: "Preocupación menor",
   },
-  "zorzal sabiá": {
+  "Zorzal sabiá": {
     commonName: "Zorzal Sabiá",
     scientificName: "Turdus leucomelas",
     description:
@@ -322,57 +322,19 @@ export const SPECIES_DATA: Record<string, SpeciesInfo> = {
   },
 };
 
-// Índice normalizado: clave en minúsculas → SpeciesInfo
-const _index: Record<string, SpeciesInfo> = Object.fromEntries(
-  Object.entries(SPECIES_DATA).map(([k, v]) => [k.toLowerCase().trim(), v])
-);
-
-// Índice por nombre científico en minúsculas
-const _sciIndex: Record<string, SpeciesInfo> = Object.fromEntries(
-  Object.values(SPECIES_DATA).map((v) => [v.scientificName.toLowerCase().trim(), v])
-);
-
-// Índice por commonName en minúsculas
-const _commonIndex: Record<string, SpeciesInfo> = Object.fromEntries(
-  Object.values(SPECIES_DATA).map((v) => [v.commonName.toLowerCase().trim(), v])
-);
-
-/**
- * Busca una especie por nombre común o científico.
- * Tolerante a mayúsculas/minúsculas y coincidencias parciales.
- */
+// Normaliza el nombre de la especie para buscarlo en el dataset
 export function lookupSpecies(name: string): SpeciesInfo | undefined {
   if (!name) return undefined;
   const key = name.toLowerCase().trim();
-
-  // 1. Coincidencia exacta por clave del dataset
-  if (_index[key]) return _index[key];
-
-  // 2. Coincidencia exacta por nombre común
-  if (_commonIndex[key]) return _commonIndex[key];
-
-  // 3. Coincidencia exacta por nombre científico
-  if (_sciIndex[key]) return _sciIndex[key];
-
-  // 4. Coincidencia parcial: el nombre buscado contiene la clave del dataset
-  const partialKey = Object.keys(_index).find(
-    (k) => key.includes(k) || k.includes(key)
+  // Búsqueda exacta primero
+  if (SPECIES_DATA[key]) return SPECIES_DATA[key];
+  // Búsqueda parcial
+  const found = Object.keys(SPECIES_DATA).find(
+    (k) => k.includes(key) || key.includes(k),
   );
-  if (partialKey) return _index[partialKey];
-
-  // 5. Coincidencia parcial por nombre común
-  const partialCommon = Object.keys(_commonIndex).find(
-    (k) => key.includes(k) || k.includes(key)
-  );
-  if (partialCommon) return _commonIndex[partialCommon];
-
-  // 6. Coincidencia parcial por nombre científico
-  const partialSci = Object.keys(_sciIndex).find(
-    (k) => key.includes(k) || k.includes(key)
-  );
-  if (partialSci) return _sciIndex[partialSci];
-
-  return undefined;
+  return found ? SPECIES_DATA[found] : undefined;
 }
 
-export const SPECIES_NAMES = Object.values(SPECIES_DATA).map((s) => s.commonName);
+export const SPECIES_NAMES = Object.values(SPECIES_DATA).map(
+  (s) => s.commonName,
+);
