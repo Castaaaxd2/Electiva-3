@@ -1,0 +1,73 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build y publicar APK de Android
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Instalar EAS CLI
+        run: npm install -g eas-cli
+
+      - name: Compilar APK con EAS
+        working-directory: artifacts/mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          eas build \
+            --platform android \
+            --profile preview \
+            --non-interactive \
+            --output ../birdlens.apk
+
+      - name: Obtener versión de la app
+        id: version
+        run: |
+          VERSION=$(node -p "require('./artifacts/mobile/app.json').expo.version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION-$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
+
+      - name: Publicar APK como Release en GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: "BirdLens ${{ steps.version.outputs.version }}"
+          body: |
+            ## BirdLens APK para Android
+
+            Descarga e instala el archivo `.apk` en tu teléfono Android.
+
+            **Pasos para instalar:**
+            1. Descarga el archivo `birdlens.apk`
+            2. En tu teléfono Android ve a **Ajustes → Seguridad → Fuentes desconocidas** y actívalo
+            3. Abre el archivo descargado y presiona **Instalar**
+
+            ---
+            Generado automáticamente desde el commit `${{ github.sha }}`
+          files: artifacts/birdlens.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
