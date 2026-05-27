@@ -1,6 +1,9 @@
 import type { BirdResult } from "@/context/BirdStore";
 
-export async function identifyBirdFromBase64(base64: string): Promise<BirdResult> {
+export async function identifyBirdFromBase64(
+  base64: string,
+  signal?: AbortSignal,
+): Promise<BirdResult> {
   const domain = process.env.EXPO_PUBLIC_DOMAIN;
   const url = `https://${domain}/api/birds/identify`;
 
@@ -8,6 +11,7 @@ export async function identifyBirdFromBase64(base64: string): Promise<BirdResult
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ imageBase64: base64 }),
+    signal,
   });
 
   if (!response.ok) {
