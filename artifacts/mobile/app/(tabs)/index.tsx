@@ -51,11 +51,37 @@ export default function IdentifyScreen() {
   const { isOffline } = useNetworkStatus();
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedBase64, setSelectedBase64] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const cancelRef = useRef<{ aborted: boolean; controller: AbortController } | null>(null);
 
   const analyzeButtonScale = useSharedValue(1);
   const imageScale = useSharedValue(1);
+
+  const prepareImage = useCallback(async (rawUri: string) => {
+    setIsProcessing(true);
+    try {
+      const prepared = await ImageManipulator.manipulateAsync(
+        rawUri,
+        [{ resize: { width: 1024 } }],
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG, base64: true },
+      );
+      if (!prepared.base64) {
+        throw new Error("La imagen no se pudo decodificar.");
+      }
+      setSelectedImage(prepared.uri);
+      setSelectedBase64(prepared.base64);
+      imageScale.value = withSequence(withTiming(0.95, { duration: 100 }), withSpring(1));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      Alert.alert("Error al procesar imagen", msg);
+      setSelectedImage(null);
+      setSelectedBase64(null);
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [imageScale]);
 
   const animatedAnalyzeStyle = useAnimatedStyle(() => ({
     transform: [{ scale: analyzeButtonScale.value }],
@@ -82,10 +108,9 @@ export default function IdentifyScreen() {
     });
 
     if (!result.canceled && result.assets[0]) {
-      setSelectedImage(result.assets[0].uri);
-      imageScale.value = withSequence(withTiming(0.95, { duration: 100 }), withSpring(1));
+      await prepareImage(result.assets[0].uri);
     }
-  }, []);
+  }, [prepareImage]);
 
   const handleGalleryPress = useCallback(async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -98,10 +123,9 @@ export default function IdentifyScreen() {
     });
 
     if (!result.canceled && result.assets[0]) {
-      setSelectedImage(result.assets[0].uri);
-      imageScale.value = withSequence(withTiming(0.95, { duration: 100 }), withSpring(1));
+      await prepareImage(result.assets[0].uri);
     }
-  }, []);
+  }, [prepareImage]);
 
   const handleCancelAnalysis = useCallback(async () => {
     if (cancelRef.current) {
@@ -113,7 +137,7 @@ export default function IdentifyScreen() {
   }, []);
 
   const handleAnalyzePress = useCallback(async () => {
-    if (!selectedImage) return;
+    if (!selectedImage || !selectedBase64) return;
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     analyzeButtonScale.value = withSequence(withSpring(0.94), withSpring(1));
 
@@ -124,17 +148,7 @@ export default function IdentifyScreen() {
     setIsAnalyzing(true);
     try {
       const id = generateUUID();
-
-      const preparedImage = await ImageManipulator.manipulateAsync(
-        selectedImage,
-        [{ resize: { width: 1024 } }],
-        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG, base64: true },
-      );
-
-      if (cancelState.aborted) return;
-      if (!preparedImage.base64) throw new Error("No se pudo procesar la imagen.");
-
-      const base64ForAnalysis = preparedImage.base64;
+      const base64ForAnalysis = selectedBase64;
 
       const locationPromise = (async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -150,7 +164,7 @@ export default function IdentifyScreen() {
       })();
 
       const identifyPromise = isOffline
-        ? identifyBirdOffline(preparedImage.uri)
+        ? identifyBirdOffline(selectedImage)
         : identifyBirdFromBase64(base64ForAnalysis, controller.signal);
 
       const [locationResult, identifyResult] = await Promise.allSettled([
@@ -180,10 +194,11 @@ export default function IdentifyScreen() {
       cancelRef.current = null;
       setIsAnalyzing(false);
     }
-  }, [selectedImage, isOffline, addToHistory]);
+  }, [selectedImage, selectedBase64, isOffline, addToHistory]);
 
   const handleReset = useCallback(() => {
     setSelectedImage(null);
+    setSelectedBase64(null);
   }, []);
 
   const styles = makeStyles(colors);
@@ -223,7 +238,17 @@ export default function IdentifyScreen() {
         {/* Imagen seleccionada */}
         {selectedImage ? (
           <Animated.View style={[styles.imageContainer, animatedImageStyle]} entering={FadeIn.duration(400)}>
-            <Image source={{ uri: selectedImage }} style={styles.selectedImage} />
+            <Image
+              source={{ uri: selectedImage }}
+              style={styles.selectedImage}
+              resizeMode="cover"
+              onError={(e) => {
+                Alert.alert(
+                  "No se pudo mostrar la imagen",
+                  `URI: ${selectedImage}\nError: ${e.nativeEvent?.error ?? "desconocido"}`,
+                );
+              }}
+            />
             {isAnalyzing && (
               <View style={styles.analyzingOverlay}>
                 <ActivityIndicator size="large" color="#FFFFFF" />
@@ -245,11 +270,20 @@ export default function IdentifyScreen() {
           /* Placeholder cuando no hay foto */
           <Animated.View entering={FadeInDown.delay(200).duration(500)} style={styles.placeholder}>
             <View style={styles.placeholderInner}>
-              <Ionicons name="camera" size={56} color={colors.primary} />
-              <Text style={styles.placeholderTitle}>Sin foto</Text>
-              <Text style={styles.placeholderText}>
-                Toma o sube una foto del ave para comenzar la identificación
-              </Text>
+              {isProcessing ? (
+                <>
+                  <ActivityIndicator size="large" color={colors.primary} />
+                  <Text style={styles.placeholderTitle}>Procesando foto...</Text>
+                </>
+              ) : (
+                <>
+                  <Ionicons name="camera" size={56} color={colors.primary} />
+                  <Text style={styles.placeholderTitle}>Sin foto</Text>
+                  <Text style={styles.placeholderText}>
+                    Toma o sube una foto del ave para comenzar la identificación
+                  </Text>
+                </>
+              )}
             </View>
           </Animated.View>
         )}
