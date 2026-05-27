@@ -1,6 +1,7 @@
 import * as ImageManipulator from "expo-image-manipulator";
 import { decode as decodeBase64 } from "base64-arraybuffer";
 import jpeg from "jpeg-js";
+import { loadTensorflowModel, type TfliteModel } from "react-native-fast-tflite";
 
 import type { BirdResult } from "@/context/BirdStore";
 import SPECIES_DATA from "@/assets/models/bird_species_data.json";
@@ -27,14 +28,11 @@ const speciesData: Record<string, SpeciesData> = SPECIES_DATA.species as Record<
   SpeciesData
 >;
 
-let modelInstance: import("react-native-fast-tflite").TfliteModel | null = null;
+let modelInstance: TfliteModel | null = null;
 
-async function getModel(): Promise<
-  import("react-native-fast-tflite").TfliteModel
-> {
+async function getModel(): Promise<TfliteModel> {
   if (modelInstance) return modelInstance;
   try {
-    const { loadTensorflowModel } = await import("react-native-fast-tflite");
     modelInstance = await loadTensorflowModel(
       require("../assets/models/mobilenet_v1_1.0_224_quant.tflite") as number,
       []
