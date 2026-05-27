@@ -1,10 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Location from "expo-location";
 import { router } from "expo-router";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import {
   Alert,
   Image,
@@ -50,8 +51,8 @@ export default function IdentifyScreen() {
   const { isOffline } = useNetworkStatus();
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [selectedBase64, setSelectedBase64] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const cancelRef = useRef<{ aborted: boolean; controller: AbortController } | null>(null);
 
   const analyzeButtonScale = useSharedValue(1);
   const imageScale = useSharedValue(1);
@@ -76,19 +77,12 @@ export default function IdentifyScreen() {
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ["images"],
       allowsEditing: false,
-      quality: 0.6,
-      base64: true,
+      quality: 0.7,
       exif: false,
     });
 
     if (!result.canceled && result.assets[0]) {
-      const asset = result.assets[0];
-      if (!asset.base64) {
-        Alert.alert("Error al procesar foto", "No se pudo leer la imagen capturada. Inténtalo de nuevo.");
-        return;
-      }
-      setSelectedImage(asset.uri);
-      setSelectedBase64(asset.base64);
+      setSelectedImage(result.assets[0].uri);
       imageScale.value = withSequence(withTiming(0.95, { duration: 100 }), withSpring(1));
     }
   }, []);
@@ -99,31 +93,48 @@ export default function IdentifyScreen() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: false,
-      quality: 0.6,
-      base64: true,
+      quality: 0.7,
       exif: false,
     });
 
     if (!result.canceled && result.assets[0]) {
-      const asset = result.assets[0];
-      if (!asset.base64) {
-        Alert.alert("Error al procesar imagen", "No se pudo leer la imagen seleccionada.");
-        return;
-      }
-      setSelectedImage(asset.uri);
-      setSelectedBase64(asset.base64);
+      setSelectedImage(result.assets[0].uri);
       imageScale.value = withSequence(withTiming(0.95, { duration: 100 }), withSpring(1));
     }
   }, []);
 
+  const handleCancelAnalysis = useCallback(async () => {
+    if (cancelRef.current) {
+      cancelRef.current.aborted = true;
+      cancelRef.current.controller.abort();
+    }
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setIsAnalyzing(false);
+  }, []);
+
   const handleAnalyzePress = useCallback(async () => {
-    if (!selectedBase64 || !selectedImage) return;
+    if (!selectedImage) return;
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     analyzeButtonScale.value = withSequence(withSpring(0.94), withSpring(1));
+
+    const controller = new AbortController();
+    const cancelState = { aborted: false, controller };
+    cancelRef.current = cancelState;
 
     setIsAnalyzing(true);
     try {
       const id = generateUUID();
+
+      const preparedImage = await ImageManipulator.manipulateAsync(
+        selectedImage,
+        [{ resize: { width: 1024 } }],
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG, base64: true },
+      );
+
+      if (cancelState.aborted) return;
+      if (!preparedImage.base64) throw new Error("No se pudo procesar la imagen.");
+
+      const base64ForAnalysis = preparedImage.base64;
 
       const locationPromise = (async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -139,14 +150,15 @@ export default function IdentifyScreen() {
       })();
 
       const identifyPromise = isOffline
-        ? identifyBirdOffline(selectedImage)
-        : identifyBirdFromBase64(selectedBase64);
+        ? identifyBirdOffline(preparedImage.uri)
+        : identifyBirdFromBase64(base64ForAnalysis, controller.signal);
 
       const [locationResult, identifyResult] = await Promise.allSettled([
         locationPromise,
         identifyPromise,
       ]);
 
+      if (cancelState.aborted) return;
       if (identifyResult.status === "rejected") throw identifyResult.reason;
 
       const result = identifyResult.value;
@@ -154,22 +166,24 @@ export default function IdentifyScreen() {
         locationResult.status === "fulfilled" ? locationResult.value : undefined;
 
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      addToHistory({ ...result, id, imageBase64: selectedBase64, location, analyzedAt: new Date().toISOString() });
+      addToHistory({ ...result, id, imageBase64: base64ForAnalysis, location, analyzedAt: new Date().toISOString() });
       router.push({ pathname: "/result", params: { resultId: id } });
     } catch (err) {
+      if (cancelState.aborted) return;
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      const errorMsg = err instanceof Error ? err.message : String(err);
       const msg = isOffline
-        ? "No se pudo identificar localmente. El modelo offline solo funciona en la app instalada (APK), no en la vista previa."
-        : "No se pudo analizar la imagen. Por favor, inténtalo de nuevo.";
+        ? `No se pudo identificar localmente: ${errorMsg}`
+        : `No se pudo analizar la imagen: ${errorMsg}`;
       Alert.alert("Identificación fallida", msg);
     } finally {
+      cancelRef.current = null;
       setIsAnalyzing(false);
     }
-  }, [selectedBase64, selectedImage, isOffline, addToHistory]);
+  }, [selectedImage, isOffline, addToHistory]);
 
   const handleReset = useCallback(() => {
     setSelectedImage(null);
-    setSelectedBase64(null);
   }, []);
 
   const styles = makeStyles(colors);
@@ -214,6 +228,10 @@ export default function IdentifyScreen() {
               <View style={styles.analyzingOverlay}>
                 <ActivityIndicator size="large" color="#FFFFFF" />
                 <Text style={styles.analyzingText}>Analizando especie...</Text>
+                <Pressable style={styles.cancelButton} onPress={handleCancelAnalysis}>
+                  <Ionicons name="close" size={16} color="#FFFFFF" />
+                  <Text style={styles.cancelButtonText}>Cancelar</Text>
+                </Pressable>
               </View>
             )}
             {!isAnalyzing && (
@@ -421,6 +439,23 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       color: "#FFFFFF",
       fontSize: 13,
       fontFamily: "Inter_500Medium",
+    },
+    cancelButton: {
+      marginTop: 8,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingHorizontal: 16,
+      paddingVertical: 9,
+      borderRadius: 22,
+      backgroundColor: "rgba(255,255,255,0.18)",
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.5)",
+    },
+    cancelButtonText: {
+      color: "#FFFFFF",
+      fontSize: 14,
+      fontFamily: "Inter_600SemiBold",
     },
     actions: {
       gap: 10,
