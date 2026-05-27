@@ -41,8 +41,17 @@ function ClassicTabLayout() {
   const isIOS = Platform.OS === "ios";
   const isWeb = Platform.OS === "web";
 
-  const tabBarHeight = isWeb ? 84 : isIOS ? 50 + insets.bottom : 60 + insets.bottom;
-  const tabBarPaddingBottom = isWeb ? 34 : isIOS ? insets.bottom : 8 + insets.bottom;
+  const androidExtraBottom = 48;
+  const tabBarHeight = isWeb
+    ? 84
+    : isIOS
+      ? 50 + insets.bottom
+      : 60 + insets.bottom + androidExtraBottom;
+  const tabBarPaddingBottom = isWeb
+    ? 34
+    : isIOS
+      ? insets.bottom
+      : 8 + insets.bottom + androidExtraBottom;
 
   return (
     <Tabs
