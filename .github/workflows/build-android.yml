@@ -39,12 +39,23 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
+          set +e
           eas build \
             --platform android \
             --profile preview \
             --non-interactive \
             --wait \
-            --json 2>/dev/null > /tmp/build_result.json
+            --json > /tmp/build_result.json 2> /tmp/build_err.log
+          EAS_EXIT=$?
+          if [ $EAS_EXIT -ne 0 ]; then
+            echo "=== EAS BUILD FAILED (exit $EAS_EXIT) ==="
+            echo "--- stderr ---"
+            cat /tmp/build_err.log || true
+            echo "--- stdout (json) ---"
+            cat /tmp/build_result.json || true
+            exit 1
+          fi
+          set -e
           BUILD_URL=$(jq -r '.[0].artifacts.buildUrl // .[0].artifacts.applicationArchiveUrl' /tmp/build_result.json)
           echo "APK URL: $BUILD_URL"
           curl -L "$BUILD_URL" -o ../birdlens.apk
