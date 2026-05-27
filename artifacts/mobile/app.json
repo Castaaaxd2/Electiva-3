@@ -2,7 +2,7 @@
   "expo": {
     "name": "BirdLens",
     "slug": "mobile",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "mobile",
@@ -63,7 +63,8 @@
           "cameraPermission": "BirdLens usa la cámara para fotografiar aves e identificar su especie.",
           "savePhotosPermission": "BirdLens puede guardar fotos de aves en tu galería."
         }
-      ]
+      ],
+      "react-native-fast-tflite"
     ],
     "experiments": {
       "typedRoutes": true,
