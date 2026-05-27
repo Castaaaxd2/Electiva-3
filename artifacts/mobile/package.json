@@ -58,6 +58,8 @@
   },
   "dependencies": {
     "@react-native-community/netinfo": "^11.4.1",
+    "@tensorflow-models/mobilenet": "^2.1.1",
+    "@tensorflow/tfjs": "^4.22.0",
     "base64-arraybuffer": "^1.0.2",
     "expo-image-manipulator": "^14.0.8",
     "jpeg-js": "^0.4.4",
