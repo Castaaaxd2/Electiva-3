@@ -17,3 +17,5 @@ export async function identifyBirdFromBase64(base64: string): Promise<BirdResult
 
   return response.json() as Promise<BirdResult>;
 }
+
+export { identifyBirdOffline } from "@/lib/offlineBirdClassifier";

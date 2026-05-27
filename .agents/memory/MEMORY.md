@@ -1,0 +1,2 @@
+- [BirdLens offline ML](birdlens-offline-ml.md) — MobileNet V1 quant TFLite via react-native-fast-tflite v3 (Nitro Modules); only works in EAS Build APK, not Expo Go.
+- [BirdLens stack](birdlens-stack.md) — Expo SDK 54, 32 Colombian bird species, UCC colors, GPS+UUID+offline+map tabs, EAS Build on GitHub Actions.

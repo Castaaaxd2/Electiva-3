@@ -1,0 +1,289 @@
+{
+  "species": {
+    "Canario costeño": {
+      "scientificName": "Sicalis flaveola",
+      "description": "Ave pequeña de plumaje amarillo brillante con tonos verdes en el dorso. El macho tiene la cabeza completamente amarilla. Es muy común en zonas abiertas y bordes de bosque de la costa colombiana.",
+      "habitat": "Sabanas, pastizales, jardines y áreas abiertas con arbustos",
+      "diet": "Semillas de gramíneas, frutos pequeños e insectos ocasionalmente",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Caracara plancus": {
+      "scientificName": "Caracara plancus",
+      "description": "Rapaz grande con cara roja desnuda, corona negra y cuerpo barrado de blanco y negro. Vuelo alternando aleteos y planeo. Carroñero oportunista que también caza presas vivas.",
+      "habitat": "Sabanas, pastizales, bordes de ríos y áreas agrícolas",
+      "diet": "Carroña, insectos, pequeños vertebrados y frutos ocasionales",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Carpinterito Oliváceo": {
+      "scientificName": "Picumnus olivaceus",
+      "description": "El carpinterito más pequeño de Colombia, de apenas 9 cm. Dorso oliváceo, vientre pálido con puntos oscuros. El macho tiene manchas rojas en la corona. Se mueve ágilmente por ramas delgadas.",
+      "habitat": "Bordes de bosque húmedo, matorrales y jardines arbolados",
+      "diet": "Insectos y larvas que excava en ramas delgadas y tallos",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Carpintero Coronirrojo": {
+      "scientificName": "Melanerpes rubricapillus",
+      "description": "Carpintero mediano con barras blancas y negras en el dorso, cara y vientre blancos, y corona roja brillante en el macho. Muy vocal, con llamados fuertes y repetitivos.",
+      "habitat": "Bosques abiertos, palmares, jardines y arboledas urbanas",
+      "diet": "Insectos, frutos, néctar y semillas",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Centzontle Tropical": {
+      "scientificName": "Mimus gilvus",
+      "description": "Ave gris pálida, esbelta, con cola larga y pico curvo. Cantora excepcional capaz de imitar docenas de otras aves. Cola con puntas blancas visibles en vuelo.",
+      "habitat": "Áreas abiertas, jardines, parques y bordes de bosque seco",
+      "diet": "Insectos, frutos, bayas y néctar de flores",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Chulo": {
+      "scientificName": "Coragyps atratus",
+      "description": "Buitre negro grande con cabeza y cuello desnudos de color gris oscuro. En vuelo muestra manchas blancas en las puntas de las alas. Formador de grupos en corrientes térmicas.",
+      "habitat": "Muy adaptable: ciudades, campos abiertos, bosques y costas",
+      "diet": "Carroña de animales muertos; raramente frutos",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Colibrí Cola Canela": {
+      "scientificName": "Amazilia tzacatl",
+      "description": "Colibrí mediano con dorso verde brillante y cola de color canela a rufo. El pico es recto y moderadamente largo. Muy territorial y agresivo con otros colibríes.",
+      "habitat": "Bordes de bosque, jardines, cafetales y áreas abiertas con flores",
+      "diet": "Néctar de flores y pequeños insectos para proteína",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Colibrí cola de raqueta": {
+      "scientificName": "Ocreatus underwoodii",
+      "description": "Colibrí espectacular con los dos plumas externas de la cola extremadamente largas terminadas en discos ovales (raquetas). El macho tiene plumaje verde iridiscente y los pies con mechones blancos.",
+      "habitat": "Laderas andinas entre 1400 y 2800 metros de altitud",
+      "diet": "Néctar de flores de bosque andino e insectos pequeños",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Copetón": {
+      "scientificName": "Zonotrichia capensis",
+      "description": "Gorrión pequeño con corona a rayas negras y grises, collar rufo en el cuello y pecho manchado. Muy común en zonas altoandinas. Su canto es uno de los más conocidos de Colombia.",
+      "habitat": "Bordes de camino, pastizales, jardines y áreas abiertas desde los 1000 hasta los 4000 msnm",
+      "diet": "Semillas, insectos pequeños y restos de alimento",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Cucarachero común": {
+      "scientificName": "Troglodytes aedon",
+      "description": "Ave pequeña de color pardo con barrado oscuro en alas y cola. Cola frecuentemente levantada. Canto fuerte y melodioso desproporcionado a su tamaño. Muy activo y curioso.",
+      "habitat": "Muy adaptable: jardines, matorrales, bordes de bosque y zonas rurales",
+      "diet": "Insectos, arañas, larvas y pequeños invertebrados",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Eufonia Piquigruesa": {
+      "scientificName": "Euphonia laniirostris",
+      "description": "Eufonia pequeña con pico corto y grueso. El macho es azul-negro con frente y vientre amarillos. La hembra es verde-oliva. Se mueve en parejas o pequeños grupos en los árboles frutales.",
+      "habitat": "Bordes de bosque, jardines arbolados, cafetales y áreas semiabiertas",
+      "diet": "Frutos de muérdago (Struthanthus), bayas y frutos pequeños",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Garza ganadera": {
+      "scientificName": "Bubulcus ibis",
+      "description": "Garza blanca compacta que frecuentemente acompaña al ganado para atrapar los insectos que este levanta. En época reproductiva desarrolla plumas anaranjadas en cabeza, pecho y dorso.",
+      "habitat": "Pastizales ganaderos, arrozales, lagunas y bordes de ríos",
+      "diet": "Insectos, ranas, lagartijas y pequeños roedores",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Garza Ganadera Occidental": {
+      "scientificName": "Ardea alba",
+      "description": "La garza blanca más grande, completamente blanca con pico amarillo largo y patas negras. En vuelo dobla el cuello formando una S. En cría desarrolla largas plumas nupciales.",
+      "habitat": "Orillas de ríos, lagunas, ciénagas, estuarios y arrozales",
+      "diet": "Peces, ranas, insectos acuáticos y pequeños vertebrados",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Gavilán caminero": {
+      "scientificName": "Rupornis magnirostris",
+      "description": "Gavilán mediano, muy común y ruidoso. Dorso pardo, pecho barrado de blanco y naranja, cola con bandas. Canto chillón y repetido que da nombre a muchas zonas rurales.",
+      "habitat": "Bordes de bosque, potreros, jardines y orillas de caminos",
+      "diet": "Lagartijas, ranas, ratones, insectos grandes y aves pequeñas",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Golondrina azul y blanco": {
+      "scientificName": "Pygochelidon cyanoleuca",
+      "description": "Golondrina pequeña con dorso azul-negro iridiscente y vientre completamente blanco. Muy ágil en el vuelo, cazando insectos al vuelo. Anida en huecos de árboles o construcciones.",
+      "habitat": "Áreas abiertas, bordes de ríos, pueblos y ciudades andinas",
+      "diet": "Insectos capturados al vuelo: moscas, mosquitos y mariposas",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Golondrina Yucateca": {
+      "scientificName": "Petrochelidon fulva",
+      "description": "Golondrina de tamaño mediano con frente rufa, rabadilla canela y vientre blanquecino. Forma colonias para anidar en acantilados y construcciones. Migra estacionalmente.",
+      "habitat": "Acantilados, cuevas, puentes y edificaciones cerca de áreas abiertas",
+      "diet": "Insectos voladores capturados en vuelo",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Loro Cabeciazul": {
+      "scientificName": "Pionus menstruus",
+      "description": "Loro mediano con cabeza y cuello azules brillantes, cuerpo verde y parches rojos bajo la cola. Vuelo rápido con aleteos cortos. Muy ruidoso en grupos. Popular en avicultura.",
+      "habitat": "Bosques húmedos tropicales y subtropicales, bordes y áreas semiabiertas",
+      "diet": "Frutos, semillas, flores y brotes foliares",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Luis Bienteveo": {
+      "scientificName": "Pitangus sulphuratus",
+      "description": "Tiránido grande con corona amarilla oculta, lista superciliar blanca, garganta blanca y vientre amarillo brillante. Su canto onomatopéyico 'bien-te-veo' es inconfundible.",
+      "habitat": "Bordes de bosque, jardines, orillas de agua y áreas arboladas",
+      "diet": "Insectos grandes, pequeñas ranas, frutos y peces pequeños en superficie",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Mango Gorjinegro": {
+      "scientificName": "Anthracothorax nigricollis",
+      "description": "Colibrí grande y llamativo. El macho tiene garganta y pecho negros bordeados de verde iridiscente. La hembra es verde con línea media ventral negra y bordes blancos en la cola.",
+      "habitat": "Bordes de bosque, jardines, áreas abiertas con flores y cafetales",
+      "diet": "Néctar de flores grandes, especialmente heliconias, e insectos",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Mirla patinaranja": {
+      "scientificName": "Turdus fuscater",
+      "description": "El tordo más grande de los Andes, con plumaje oscuro marrón-negro, patas y pico de color naranja-amarillo brillante. Canto melodioso y variado. Muy común en ciudades andinas.",
+      "habitat": "Bordes de bosque andino, jardines, parques urbanos entre 1800 y 3500 msnm",
+      "diet": "Frutos, lombrices, insectos y pequeños invertebrados del suelo",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Paloma doméstica": {
+      "scientificName": "Columba livia",
+      "description": "Paloma familiar de plumaje variable (gris, blanco, negro o moteado). Originaria de Europa y Asia, presente en todas las ciudades del mundo. Muy adaptada al ambiente urbano.",
+      "habitat": "Ciudades, plazas, puentes, edificios y zonas rurales",
+      "diet": "Granos, restos de comida, semillas e insectos ocasionales",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Papamoscas Rayado Chico": {
+      "scientificName": "Myiodynastes maculatus",
+      "description": "Tiránido robusto con marcas rayadas en el dorso, lista superciliar amarilla y manchas oscuras en el pecho. Activo y ruidoso. Caza insectos desde perchas prominentes.",
+      "habitat": "Bordes de bosque, áreas semiabiertas, jardines y riberas arboladas",
+      "diet": "Insectos grandes, frutos ocasionales y pequeños vertebrados",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Perico carisucio": {
+      "scientificName": "Brotogeris jugularis",
+      "description": "Perico pequeño y sociable con plumaje verde brillante, mancha naranja-amarilla en la garganta y pico ganchudo. Forma bandadas ruidosas. Se adapta bien a ambientes urbanos.",
+      "habitat": "Bordes de bosque seco, áreas semiabiertas, jardines y parques",
+      "diet": "Frutos, semillas, flores y néctar",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Rascón Chiricote": {
+      "scientificName": "Aramides cajaneus",
+      "description": "Rascón grande y terrestre con cuello y pecho grises, dorso oliva, abdomen rufo y patas rojizas. Canto muy característico en coro al amanecer y atardecer. Tímido pero a veces visible.",
+      "habitat": "Bordes de ciénagas, ríos, arrozales y bosques húmedos con agua",
+      "diet": "Insectos, cangrejos de río, semillas y pequeños vertebrados acuáticos",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Semillero común": {
+      "scientificName": "Sporophila americana",
+      "description": "Semillero pequeño con pico cónico corto. El macho tiene partes superiores negras y partes inferiores blancas. La hembra es parda uniforme. Forma bandadas en campos con hierbas.",
+      "habitat": "Pastizales, bordes de caminos, arrozales y campos con gramíneas",
+      "diet": "Semillas de gramíneas e insectos pequeños",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Tangara Azulegris": {
+      "scientificName": "Thraupis episcopus",
+      "description": "Una de las tangaras más comunes de Colombia. Plumaje azul celeste pálido con alas y cola más oscuras. El macho tiene hombros azul brillante. Muy adaptable al ambiente urbano.",
+      "habitat": "Bordes de bosque, jardines, parques, cafetales y áreas semiabiertas",
+      "diet": "Frutos de todo tipo, néctar, insectos y artrópodos",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Tangara dorada": {
+      "scientificName": "Tangara arthus",
+      "description": "Tangara mediana con cabeza dorada brillante, dorso negro con escamas doradas y vientre rufo-canela. Una de las tangaras más coloridas de los Andes colombianos.",
+      "habitat": "Bosques andinos húmedos entre 900 y 2200 metros de altitud",
+      "diet": "Frutos, insectos y artrópodos en el dosel del bosque",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Tirano Pirirí": {
+      "scientificName": "Tyrannus melancholicus",
+      "description": "Tiránido grande con corona grisácea, dorso verde oliva, garganta blanca y vientre amarillo pálido. Su canto metálico 'pi-ri-rí' es muy característico. Migrador parcial.",
+      "habitat": "Áreas abiertas y semiabiertas, bordes de bosque y riberas de agua",
+      "diet": "Insectos grandes capturados al vuelo y ocasionalmente frutos",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Tordo negro": {
+      "scientificName": "Molothrus bonariensis",
+      "description": "El macho es completamente negro con brillo azul-violeta iridiscente. La hembra es parda. Parásito de cría que pone sus huevos en nidos de otras aves. Muy común en áreas abiertas.",
+      "habitat": "Pastizales, potreros, arrozales, jardines y áreas urbanas",
+      "diet": "Semillas, insectos y restos de comida",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Tortolita común": {
+      "scientificName": "Columbina talpacoti",
+      "description": "Tortolita muy pequeña con plumaje pardo rojizo, manchas negras en las alas y pecho rosado. Siempre se ve en el suelo o en ramas bajas. Muy común en zonas rurales y urbanas.",
+      "habitat": "Pastizales, potreros, jardines, arrozales y áreas semiabiertas",
+      "diet": "Semillas pequeñas de gramíneas e insectos ocasionales",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Vireón Cejas Canela": {
+      "scientificName": "Cyclarhis gujanensis",
+      "description": "Vireón robusto con cabeza gris, cejas canela-rufas llamativas, partes superiores verdes y vientre amarillento. Canto fuerte y repetitivo desde el dosel del bosque.",
+      "habitat": "Bordes de bosque, jardines arbolados y matorrales húmedos",
+      "diet": "Insectos, arañas, larvas e invertebrados en follaje",
+      "conservationStatus": "Preocupación menor"
+    },
+    "Zorzal Sabiá": {
+      "scientificName": "Turdus leucomelas",
+      "description": "Tordo mediano con dorso pardo, vientre blanquecino y manchas oscuras en el pecho. Canto melodioso y variado. Muy confiado en presencia humana y común en jardines.",
+      "habitat": "Bordes de bosque, jardines, parques y áreas arboladas tropicales",
+      "diet": "Frutos, lombrices de tierra, insectos y pequeños invertebrados",
+      "conservationStatus": "Preocupación menor"
+    }
+  },
+  "imagenetMapping": {
+    "8": "Copetón",
+    "9": "Semillero común",
+    "10": "Garza ganadera",
+    "11": "Canario costeño",
+    "12": "Canario costeño",
+    "13": "Semillero común",
+    "14": "Semillero común",
+    "15": "Tangara Azulegris",
+    "16": "Mirla patinaranja",
+    "17": "Cucarachero común",
+    "18": "Luis Bienteveo",
+    "19": "Tordo negro",
+    "20": "Cucarachero común",
+    "21": "Cucarachero común",
+    "22": "Gavilán caminero",
+    "23": "Caracara plancus",
+    "24": "Chulo",
+    "25": "Carpintero Coronirrojo",
+    "81": "Tortolita común",
+    "82": "Tortolita común",
+    "83": "Tortolita común",
+    "84": "Tortolita común",
+    "85": "Loro Cabeciazul",
+    "86": "Tortolita común",
+    "87": "Tortolita común",
+    "88": "Loro Cabeciazul",
+    "89": "Loro Cabeciazul",
+    "90": "Perico carisucio",
+    "91": "Perico carisucio",
+    "92": "Tirano Pirirí",
+    "93": "Mango Gorjinegro",
+    "94": "Carpintero Coronirrojo",
+    "95": "Colibrí Cola Canela",
+    "96": "Carpinterito Oliváceo",
+    "97": "Tangara dorada",
+    "98": "Rascón Chiricote",
+    "99": "Rascón Chiricote",
+    "100": "Rascón Chiricote",
+    "101": "Tordo negro",
+    "128": "Garza Ganadera Occidental",
+    "129": "Tordo negro",
+    "130": "Garza ganadera",
+    "131": "Garza ganadera",
+    "132": "Garza ganadera",
+    "133": "Garza Ganadera Occidental",
+    "134": "Garza ganadera",
+    "135": "Garza Ganadera Occidental",
+    "136": "Rascón Chiricote",
+    "137": "Rascón Chiricote",
+    "138": "Rascón Chiricote",
+    "139": "Gavilán caminero",
+    "140": "Papamoscas Rayado Chico",
+    "141": "Papamoscas Rayado Chico",
+    "142": "Papamoscas Rayado Chico",
+    "143": "Papamoscas Rayado Chico",
+    "144": "Gavilán caminero",
+    "145": "Garza ganadera",
+    "146": "Garza ganadera",
+    "147": "Garza ganadera"
+  }
+}

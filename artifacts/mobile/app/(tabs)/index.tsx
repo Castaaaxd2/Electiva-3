@@ -32,7 +32,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { useBirdStore } from "@/context/BirdStore";
-import { identifyBirdFromBase64 } from "@/lib/birdApi";
+import { identifyBirdFromBase64, identifyBirdOffline } from "@/lib/birdApi";
 
 function generateUUID(): string {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
@@ -106,7 +106,7 @@ export default function IdentifyScreen() {
   }, []);
 
   const handleAnalyzePress = useCallback(async () => {
-    if (!selectedBase64) return;
+    if (!selectedBase64 || !selectedImage) return;
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     analyzeButtonScale.value = withSequence(withSpring(0.94), withSpring(1));
 
@@ -114,37 +114,47 @@ export default function IdentifyScreen() {
     try {
       const id = generateUUID();
 
-      const [locationResult, apiResult] = await Promise.allSettled([
-        (async () => {
-          const { status } = await Location.requestForegroundPermissionsAsync();
-          if (status !== "granted") return undefined;
-          const pos = await Promise.race<Location.LocationObject | null>([
-            Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
-            new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000)),
-          ]);
-          if (pos && pos.coords) {
-            return { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
-          }
-          return undefined;
-        })(),
-        identifyBirdFromBase64(selectedBase64),
+      const locationPromise = (async () => {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") return undefined;
+        const pos = await Promise.race<Location.LocationObject | null>([
+          Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000)),
+        ]);
+        if (pos?.coords) {
+          return { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
+        }
+        return undefined;
+      })();
+
+      const identifyPromise = isOffline
+        ? identifyBirdOffline(selectedImage)
+        : identifyBirdFromBase64(selectedBase64);
+
+      const [locationResult, identifyResult] = await Promise.allSettled([
+        locationPromise,
+        identifyPromise,
       ]);
 
-      if (apiResult.status === "rejected") throw apiResult.reason;
+      if (identifyResult.status === "rejected") throw identifyResult.reason;
 
-      const result = apiResult.value;
-      const location = locationResult.status === "fulfilled" ? locationResult.value : undefined;
+      const result = identifyResult.value;
+      const location =
+        locationResult.status === "fulfilled" ? locationResult.value : undefined;
 
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      addToHistory({ ...result, id, imageBase64: selectedBase64, location });
+      addToHistory({ ...result, id, imageBase64: selectedBase64, location, analyzedAt: new Date().toISOString() });
       router.push({ pathname: "/result", params: { resultId: id } });
     } catch (err) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert("Identificación fallida", "No se pudo analizar la imagen. Por favor, inténtalo de nuevo.");
+      const msg = isOffline
+        ? "No se pudo identificar localmente. El modelo offline solo funciona en la app instalada (APK), no en la vista previa."
+        : "No se pudo analizar la imagen. Por favor, inténtalo de nuevo.";
+      Alert.alert("Identificación fallida", msg);
     } finally {
       setIsAnalyzing(false);
     }
-  }, [selectedBase64, addToHistory]);
+  }, [selectedBase64, selectedImage, isOffline, addToHistory]);
 
   const handleReset = useCallback(() => {
     setSelectedImage(null);
@@ -164,8 +174,8 @@ export default function IdentifyScreen() {
 
       {isOffline && (
         <Animated.View entering={FadeIn.duration(300)} style={styles.offlineBanner}>
-          <Ionicons name="cloud-offline-outline" size={16} color="#FFFFFF" />
-          <Text style={styles.offlineBannerText}>Sin conexión — identificación no disponible</Text>
+          <Ionicons name="phone-portrait-outline" size={16} color="#FFFFFF" />
+          <Text style={styles.offlineBannerText}>Sin conexión — usando modelo local</Text>
         </Animated.View>
       )}
 
@@ -214,12 +224,12 @@ export default function IdentifyScreen() {
           <Animated.View entering={FadeInUp.duration(400)} style={styles.actions}>
             <Animated.View style={animatedAnalyzeStyle}>
               <Pressable
-                style={[styles.analyzeButton, (isAnalyzing || isOffline) && styles.buttonDisabled]}
-                onPress={isOffline ? undefined : handleAnalyzePress}
-                disabled={isAnalyzing || isOffline}
+                style={[styles.analyzeButton, isAnalyzing && styles.buttonDisabled]}
+                onPress={handleAnalyzePress}
+                disabled={isAnalyzing}
               >
                 <LinearGradient
-                  colors={isOffline ? ["#9EADAA", "#8A9A97"] : ["#92CA3A", "#80BA27"]}
+                  colors={isOffline ? ["#5B8A6A", "#4A7A5A"] : ["#92CA3A", "#80BA27"]}
                   style={StyleSheet.absoluteFill}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
@@ -227,12 +237,18 @@ export default function IdentifyScreen() {
                 {isAnalyzing ? (
                   <ActivityIndicator size="small" color="#FFFFFF" />
                 ) : isOffline ? (
-                  <Ionicons name="cloud-offline-outline" size={22} color="#FFFFFF" />
+                  <Ionicons name="phone-portrait-outline" size={22} color="#FFFFFF" />
                 ) : (
                   <Ionicons name="scan" size={22} color="#FFFFFF" />
                 )}
                 <Text style={styles.analyzeButtonText}>
-                  {isAnalyzing ? "Analizando..." : isOffline ? "Sin conexión" : "Analizar especie"}
+                  {isAnalyzing
+                    ? isOffline
+                      ? "Identificando localmente..."
+                      : "Analizando..."
+                    : isOffline
+                      ? "Identificar offline"
+                      : "Analizar especie"}
                 </Text>
               </Pressable>
             </Animated.View>
