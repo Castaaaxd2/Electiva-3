@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Location from "expo-location";
@@ -42,6 +43,24 @@ function generateUUID(): string {
   });
 }
 
+async function prepareImage(
+  uri: string,
+  existingBase64: string | null | undefined,
+): Promise<{ uri: string; base64: string }> {
+  if (existingBase64 && existingBase64.length > 0) {
+    return { uri, base64: existingBase64 };
+  }
+  const manipulated = await ImageManipulator.manipulateAsync(
+    uri,
+    [{ resize: { width: 1024 } }],
+    { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG, base64: true },
+  );
+  if (!manipulated.base64) {
+    throw new Error("No se pudo procesar la imagen capturada.");
+  }
+  return { uri: manipulated.uri, base64: manipulated.base64 };
+}
+
 export default function IdentifyScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -81,9 +100,14 @@ export default function IdentifyScreen() {
 
     if (!result.canceled && result.assets[0]) {
       const asset = result.assets[0];
-      setSelectedImage(asset.uri);
-      setSelectedBase64(asset.base64 ?? null);
-      imageScale.value = withSequence(withTiming(0.95, { duration: 100 }), withSpring(1));
+      try {
+        const prepared = await prepareImage(asset.uri, asset.base64);
+        setSelectedImage(prepared.uri);
+        setSelectedBase64(prepared.base64);
+        imageScale.value = withSequence(withTiming(0.95, { duration: 100 }), withSpring(1));
+      } catch (err) {
+        Alert.alert("Error al procesar foto", "No se pudo cargar la imagen. Inténtalo de nuevo.");
+      }
     }
   }, []);
 
@@ -99,9 +123,14 @@ export default function IdentifyScreen() {
 
     if (!result.canceled && result.assets[0]) {
       const asset = result.assets[0];
-      setSelectedImage(asset.uri);
-      setSelectedBase64(asset.base64 ?? null);
-      imageScale.value = withSequence(withTiming(0.95, { duration: 100 }), withSpring(1));
+      try {
+        const prepared = await prepareImage(asset.uri, asset.base64);
+        setSelectedImage(prepared.uri);
+        setSelectedBase64(prepared.base64);
+        imageScale.value = withSequence(withTiming(0.95, { duration: 100 }), withSpring(1));
+      } catch (err) {
+        Alert.alert("Error al procesar imagen", "No se pudo cargar la imagen seleccionada.");
+      }
     }
   }, []);
 
@@ -163,6 +192,13 @@ export default function IdentifyScreen() {
 
   const styles = makeStyles(colors);
 
+  const tabBarOffset =
+    Platform.OS === "ios"
+      ? 50 + insets.bottom
+      : Platform.OS === "android"
+        ? 60 + insets.bottom
+        : 84;
+
   return (
     <View style={[styles.container, { paddingTop: Platform.OS === "web" ? insets.top + 67 : insets.top }]}>
       <LinearGradient
@@ -180,7 +216,7 @@ export default function IdentifyScreen() {
       )}
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarOffset + 32 }]}
         showsVerticalScrollIndicator={false}
       >
         <Animated.View entering={FadeInDown.duration(500)} style={styles.header}>
