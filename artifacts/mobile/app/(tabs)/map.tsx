@@ -1,13 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
 import React, { useMemo } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
-import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useColors } from "@/hooks/useColors";
 import { useBirdStore } from "@/context/BirdStore";
+import SightingsMap from "@/components/SightingsMap";
 
 const TOLIMA_REGION = {
   latitude: 4.4389,
@@ -50,50 +49,21 @@ export default function MapScreen() {
         </Text>
       </View>
 
-      {Platform.OS === "web" ? (
-        <View style={styles.webPlaceholder}>
-          <Ionicons name="map-outline" size={48} color={colors.mutedForeground} />
-          <Text style={styles.webPlaceholderText}>El mapa está disponible en la app móvil</Text>
-        </View>
-      ) : (
-        <MapView
-          style={styles.map}
-          provider={PROVIDER_DEFAULT}
-          initialRegion={initialRegion}
-          showsUserLocation
-          showsMyLocationButton
-        >
-          {sightings.map((sighting, i) => (
-            <Marker
-              key={sighting.id ?? String(i)}
-              coordinate={{
-                latitude: sighting.location!.latitude,
-                longitude: sighting.location!.longitude,
-              }}
-              title={sighting.topPrediction.commonName}
-              description={`${sighting.topPrediction.confidence.toFixed(0)}% confianza · ${new Date(sighting.analyzedAt).toLocaleDateString("es-ES")}`}
-              onCalloutPress={() =>
-                router.push({
-                  pathname: "/result",
-                  params: { resultId: sighting.id ?? sighting.analyzedAt },
-                })
-              }
-            />
-          ))}
-        </MapView>
-      )}
+      <View style={styles.mapContainer}>
+        <SightingsMap sightings={sightings} initialRegion={initialRegion} />
 
-      {sightings.length === 0 && Platform.OS !== "web" && (
-        <View style={styles.emptyOverlay}>
-          <View style={styles.emptyCard}>
-            <Ionicons name="location-outline" size={44} color={colors.primary} />
-            <Text style={styles.emptyTitle}>Sin avistamientos en el mapa</Text>
-            <Text style={styles.emptyText}>
-              Identifica un ave con la cámara y el avistamiento aparecerá aquí con su coordenada GPS exacta
-            </Text>
+        {sightings.length === 0 && Platform.OS !== "web" && (
+          <View style={styles.emptyOverlay}>
+            <View style={styles.emptyCard}>
+              <Ionicons name="location-outline" size={44} color={colors.primary} />
+              <Text style={styles.emptyTitle}>Sin avistamientos en el mapa</Text>
+              <Text style={styles.emptyText}>
+                Identifica un ave con la cámara y el avistamiento aparecerá aquí con su coordenada GPS exacta
+              </Text>
+            </View>
           </View>
-        </View>
-      )}
+        )}
+      </View>
     </View>
   );
 }
@@ -121,23 +91,11 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
       color: colors.mutedForeground,
       marginTop: 4,
     },
-    map: {
+    mapContainer: {
       flex: 1,
-    },
-    webPlaceholder: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 12,
-    },
-    webPlaceholderText: {
-      fontSize: 15,
-      fontFamily: "Inter_400Regular",
-      color: colors.mutedForeground,
     },
     emptyOverlay: {
       ...StyleSheet.absoluteFillObject,
-      top: 110,
       alignItems: "center",
       justifyContent: "center",
       paddingHorizontal: 32,
