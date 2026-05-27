@@ -30,6 +30,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useColors } from "@/hooks/useColors";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { useBirdStore } from "@/context/BirdStore";
 import { identifyBirdFromBase64 } from "@/lib/birdApi";
 
@@ -45,6 +46,7 @@ export default function IdentifyScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { addToHistory } = useBirdStore();
+  const { isOffline } = useNetworkStatus();
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedBase64, setSelectedBase64] = useState<string | null>(null);
@@ -160,6 +162,13 @@ export default function IdentifyScreen() {
         end={{ x: 1, y: 1 }}
       />
 
+      {isOffline && (
+        <Animated.View entering={FadeIn.duration(300)} style={styles.offlineBanner}>
+          <Ionicons name="cloud-offline-outline" size={16} color="#FFFFFF" />
+          <Text style={styles.offlineBannerText}>Sin conexión — identificación no disponible</Text>
+        </Animated.View>
+      )}
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -205,23 +214,25 @@ export default function IdentifyScreen() {
           <Animated.View entering={FadeInUp.duration(400)} style={styles.actions}>
             <Animated.View style={animatedAnalyzeStyle}>
               <Pressable
-                style={[styles.analyzeButton, isAnalyzing && styles.buttonDisabled]}
-                onPress={handleAnalyzePress}
-                disabled={isAnalyzing}
+                style={[styles.analyzeButton, (isAnalyzing || isOffline) && styles.buttonDisabled]}
+                onPress={isOffline ? undefined : handleAnalyzePress}
+                disabled={isAnalyzing || isOffline}
               >
                 <LinearGradient
-                  colors={["#92CA3A", "#80BA27"]}
+                  colors={isOffline ? ["#9EADAA", "#8A9A97"] : ["#92CA3A", "#80BA27"]}
                   style={StyleSheet.absoluteFill}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                 />
                 {isAnalyzing ? (
                   <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : isOffline ? (
+                  <Ionicons name="cloud-offline-outline" size={22} color="#FFFFFF" />
                 ) : (
                   <Ionicons name="scan" size={22} color="#FFFFFF" />
                 )}
                 <Text style={styles.analyzeButtonText}>
-                  {isAnalyzing ? "Analizando..." : "Analizar especie"}
+                  {isAnalyzing ? "Analizando..." : isOffline ? "Sin conexión" : "Analizar especie"}
                 </Text>
               </Pressable>
             </Animated.View>
@@ -275,6 +286,20 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
     container: {
       flex: 1,
       backgroundColor: colors.background,
+    },
+    offlineBanner: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      backgroundColor: "#6B7E6A",
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+    },
+    offlineBannerText: {
+      fontSize: 13,
+      fontFamily: "Inter_500Medium",
+      color: "#FFFFFF",
     },
     scrollContent: {
       paddingHorizontal: 20,
