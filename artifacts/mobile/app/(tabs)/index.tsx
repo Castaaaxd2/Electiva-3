@@ -62,11 +62,17 @@ export default function IdentifyScreen() {
   const prepareImage = useCallback(async (rawUri: string) => {
     setIsProcessing(true);
     try {
-      const prepared = await ImageManipulator.manipulateAsync(
-        rawUri,
-        [{ resize: { width: 1024 } }],
-        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG, base64: true },
-      );
+      const context = ImageManipulator.ImageManipulator.manipulate(rawUri);
+      context.resize({ width: 1024 });
+      const rendered = await context.renderAsync();
+      const prepared = await rendered.saveAsync({
+        compress: 0.7,
+        format: ImageManipulator.SaveFormat.JPEG,
+        base64: true,
+      });
+      try { rendered.release?.(); } catch {}
+      try { context.release?.(); } catch {}
+
       if (!prepared.base64) {
         throw new Error("La imagen no se pudo decodificar.");
       }
@@ -242,12 +248,6 @@ export default function IdentifyScreen() {
               source={{ uri: selectedImage }}
               style={styles.selectedImage}
               resizeMode="cover"
-              onError={(e) => {
-                Alert.alert(
-                  "No se pudo mostrar la imagen",
-                  `URI: ${selectedImage}\nError: ${e.nativeEvent?.error ?? "desconocido"}`,
-                );
-              }}
             />
             {isAnalyzing && (
               <View style={styles.analyzingOverlay}>
