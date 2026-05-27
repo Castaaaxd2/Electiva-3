@@ -2,7 +2,7 @@
   "expo": {
     "name": "BirdLens",
     "slug": "mobile",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "mobile",
@@ -68,18 +68,8 @@
       [
         "expo-build-properties",
         {
-          "android": {
-            "newArchEnabled": true,
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 35,
-            "minSdkVersion": 24,
-            "buildToolsVersion": "35.0.0",
-            "kotlinVersion": "2.0.21"
-          },
-          "ios": {
-            "newArchEnabled": true,
-            "deploymentTarget": "15.1"
-          }
+          "android": { "newArchEnabled": true },
+          "ios": { "newArchEnabled": true }
         }
       ]
     ],
