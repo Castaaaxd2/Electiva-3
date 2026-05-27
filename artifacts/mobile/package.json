@@ -61,6 +61,7 @@
     "@tensorflow-models/mobilenet": "^2.1.1",
     "@tensorflow/tfjs": "^4.22.0",
     "base64-arraybuffer": "^1.0.2",
+    "expo-build-properties": "^56.0.15",
     "expo-image-manipulator": "^14.0.8",
     "jpeg-js": "^0.4.4",
     "react-native-fast-tflite": "^3.0.1",
